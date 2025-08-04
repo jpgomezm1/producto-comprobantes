@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { DashboardHeader } from "./DashboardHeader";
-import { AnimatedSidebar, SidebarBody, SidebarLink } from "@/components/ui/animated-sidebar";
+import { AnimatedSidebar, SidebarBody, SidebarLink } from "@/components/ui/motion-sidebar";
 import { useAuth } from "@/hooks/useAuth";
 import { Loader2, Home, FileText, Plus, BarChart3, User, LogOut } from "lucide-react";
 import { motion } from "framer-motion";
