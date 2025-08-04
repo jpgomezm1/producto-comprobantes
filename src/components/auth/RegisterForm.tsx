@@ -47,7 +47,20 @@ export const RegisterForm = () => {
 
     setIsLoading(true);
 
-    const { error } = await signUp(formData.email, formData.password, formData.fullName, formData.userIdCard, formData.businessName);
+    console.log('Enviando datos de registro:', {
+      email: formData.email,
+      fullName: formData.fullName,
+      userIdCard: formData.userIdCard,
+      businessName: formData.businessName
+    });
+
+    const { error } = await signUp(
+      formData.email, 
+      formData.password, 
+      formData.fullName, 
+      formData.userIdCard, 
+      formData.businessName
+    );
     
     if (!error) {
       navigate("/login");
