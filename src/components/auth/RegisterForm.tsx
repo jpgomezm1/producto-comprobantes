@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { FileText, Eye, EyeOff, Loader2, Check, X, Info } from "lucide-react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -25,7 +26,8 @@ export const RegisterForm = () => {
   const { signUp, user } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const selectedPlan = searchParams.get('plan') || 'basico';
+  const urlPlan = searchParams.get('plan') || 'basico';
+  const [selectedPlan, setSelectedPlan] = useState(urlPlan);
 
   // Redirigir si ya está autenticado
   useEffect(() => {
@@ -79,7 +81,8 @@ export const RegisterForm = () => {
   const isPasswordMatching = formData.password === formData.confirmPassword && formData.confirmPassword.length > 0;
   const isUserIdCardValid = formData.userIdCard.trim().length > 0;
   const isBusinessNameValid = formData.businessName.trim().length > 0;
-  const isFormValid = formData.fullName && isBusinessNameValid && isUserIdCardValid && isEmailValid && isPasswordValid && isPasswordMatching;
+  const isPlanSelected = selectedPlan && ['basico', 'profesional', 'negocios'].includes(selectedPlan);
+  const isFormValid = formData.fullName && isBusinessNameValid && isUserIdCardValid && isPlanSelected && isEmailValid && isPasswordValid && isPasswordMatching;
 
   return (
     <TooltipProvider>
@@ -100,13 +103,11 @@ export const RegisterForm = () => {
             <CardDescription className="text-muted-foreground">
               Únete y comienza a gestionar tus comprobantes bancarios
             </CardDescription>
-            {selectedPlan !== 'basico' && (
-              <div className="mt-3 flex justify-center">
-                <Badge variant="secondary" className="bg-secondary-blue text-white">
-                  Plan seleccionado: {selectedPlan === 'profesional' ? 'Profesional' : 'Negocios'}
-                </Badge>
-              </div>
-            )}
+            <div className="mt-3 flex justify-center">
+              <Badge variant="secondary" className="bg-secondary-blue text-white">
+                Plan seleccionado: {selectedPlan === 'basico' ? 'Básico' : selectedPlan === 'profesional' ? 'Profesional' : 'Negocios'}
+              </Badge>
+            </div>
           </div>
         </CardHeader>
 
@@ -187,6 +188,48 @@ export const RegisterForm = () => {
                   </div>
                 )}
               </div>
+            </div>
+
+            {/* Selección de Plan */}
+            <div className="space-y-3">
+              <Label>Plan de Suscripción *</Label>
+              <RadioGroup 
+                value={selectedPlan} 
+                onValueChange={setSelectedPlan}
+                className="grid grid-cols-1 gap-3"
+                disabled={isLoading}
+              >
+                <div className="flex items-center space-x-2 border rounded-lg p-3 hover:bg-muted/50 transition-colors">
+                  <RadioGroupItem value="basico" id="basico" />
+                  <Label htmlFor="basico" className="flex-1 cursor-pointer">
+                    <div className="font-medium">Plan Básico</div>
+                    <div className="text-sm text-muted-foreground">$15 USD/mes • Hasta 150 comprobantes</div>
+                  </Label>
+                  {selectedPlan === 'basico' && (
+                    <Check className="h-4 w-4 text-accent-success" />
+                  )}
+                </div>
+                <div className="flex items-center space-x-2 border rounded-lg p-3 hover:bg-muted/50 transition-colors">
+                  <RadioGroupItem value="profesional" id="profesional" />
+                  <Label htmlFor="profesional" className="flex-1 cursor-pointer">
+                    <div className="font-medium">Plan Profesional</div>
+                    <div className="text-sm text-muted-foreground">$45 USD/mes • Hasta 600 comprobantes</div>
+                  </Label>
+                  {selectedPlan === 'profesional' && (
+                    <Check className="h-4 w-4 text-accent-success" />
+                  )}
+                </div>
+                <div className="flex items-center space-x-2 border rounded-lg p-3 hover:bg-muted/50 transition-colors">
+                  <RadioGroupItem value="negocios" id="negocios" />
+                  <Label htmlFor="negocios" className="flex-1 cursor-pointer">
+                    <div className="font-medium">Plan Negocios</div>
+                    <div className="text-sm text-muted-foreground">$90 USD/mes • Comprobantes ilimitados</div>
+                  </Label>
+                  {selectedPlan === 'negocios' && (
+                    <Check className="h-4 w-4 text-accent-success" />
+                  )}
+                </div>
+              </RadioGroup>
             </div>
 
             {/* Email */}
