@@ -1,1 +1,4 @@
 project_id = "dvgzbxjrzjktnxmfupdc"
+
+[functions.login-with-id-card]
+verify_jwt = false

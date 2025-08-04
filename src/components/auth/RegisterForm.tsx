@@ -11,6 +11,7 @@ import { useEffect } from "react";
 export const RegisterForm = () => {
   const [formData, setFormData] = useState({
     fullName: "",
+    userIdCard: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -44,7 +45,7 @@ export const RegisterForm = () => {
 
     setIsLoading(true);
 
-    const { error } = await signUp(formData.email, formData.password, formData.fullName);
+    const { error } = await signUp(formData.email, formData.password, formData.fullName, formData.userIdCard);
     
     if (!error) {
       navigate("/login");
@@ -57,7 +58,8 @@ export const RegisterForm = () => {
   const isEmailValid = formData.email.includes("@") && formData.email.includes(".");
   const isPasswordValid = formData.password.length >= 6;
   const isPasswordMatching = formData.password === formData.confirmPassword && formData.confirmPassword.length > 0;
-  const isFormValid = formData.fullName && isEmailValid && isPasswordValid && isPasswordMatching;
+  const isUserIdCardValid = formData.userIdCard.trim().length > 0;
+  const isFormValid = formData.fullName && isUserIdCardValid && isEmailValid && isPasswordValid && isPasswordMatching;
 
   return (
     <div className="min-h-screen bg-gradient-hero flex items-center justify-center px-4">
@@ -95,6 +97,32 @@ export const RegisterForm = () => {
                 required
                 disabled={isLoading}
               />
+            </div>
+
+            {/* ID (Cédula) */}
+            <div className="space-y-2">
+              <Label htmlFor="userIdCard">ID (Cédula)</Label>
+              <div className="relative">
+                <Input
+                  id="userIdCard"
+                  name="userIdCard"
+                  type="text"
+                  placeholder="12345678"
+                  value={formData.userIdCard}
+                  onChange={handleChange}
+                  required
+                  disabled={isLoading}
+                />
+                {formData.userIdCard && (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    {isUserIdCardValid ? (
+                      <Check className="h-4 w-4 text-accent-success" />
+                    ) : (
+                      <X className="h-4 w-4 text-destructive" />
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Email */}
