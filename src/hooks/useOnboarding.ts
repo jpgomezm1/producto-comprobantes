@@ -5,19 +5,19 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-// 1. Definir la forma del contexto
 interface OnboardingContextType {
   run: boolean;
   stepIndex: number;
   steps: Step[];
   startOnboarding: () => void;
+  proceedToNextStep: () => void;
   handleJoyrideCallback: (data: CallBackProps) => void;
+  showVideoDialog: boolean;
+  setShowVideoDialog: (show: boolean) => void;
 }
 
-// 2. Crear el contexto
 const OnboardingContext = createContext<OnboardingContextType | undefined>(undefined);
 
-// 3. Crear el hook para consumir el contexto
 export const useOnboarding = () => {
   const context = useContext(OnboardingContext);
   if (!context) {
@@ -26,10 +26,10 @@ export const useOnboarding = () => {
   return context;
 };
 
-// 4. Crear el componente Provider que contendrá toda la lógica y el estado
 export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [run, setRun] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
+  const [showVideoDialog, setShowVideoDialog] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -47,15 +47,9 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     },
     {
       target: '[data-tour-id="add-account-button"]',
-      content: '¡Excelente! Ahora, haz clic aquí para registrar tu primera cuenta. Esto nos ayudará a validar tus comprobantes.',
+      content: '¡Excelente! Ahora, añade tu primera cuenta. El tour continuará automáticamente cuando guardes la cuenta.',
       spotlightClicks: true,
-      placement: 'bottom',
-    },
-    {
-      target: 'body',
-      content: '¡Fantástico! Has configurado tu primera cuenta. Ahora puedes volver al dashboard para ver tus estadísticas.',
-      placement: 'center',
-      disableBeacon: true,
+      placement: 'right',
     },
     {
       target: '[data-tour-id="dashboard-stats"]',
@@ -63,6 +57,11 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       placement: 'bottom',
     },
   ];
+  
+  const proceedToNextStep = useCallback(() => {
+    setStepIndex(3);
+    setRun(true);
+  }, []);
 
   const handleJoyrideCallback = useCallback(async (data: CallBackProps) => {
     const { action, index, status, type } = data;
@@ -88,15 +87,17 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       return;
     }
 
-    if (([EVENTS.STEP_AFTER] as string[]).includes(type)) {
-      const nextStepIndex = index + (action === ACTIONS.PREV ? -1 : 1);
-      
-      // Manejo de navegación explícita solo cuando es necesario
-      if (index === 3 && action === ACTIONS.NEXT) {
+    if (type === EVENTS.STEP_AFTER) {
+      if (index === 0 && action === ACTIONS.NEXT) {
         navigate('/dashboard');
+        setStepIndex(1);
+      } else if (index === 1 && action === ACTIONS.NEXT) {
+        navigate('/profile');
+        setStepIndex(2);
+      } else if (index === 2 && action === ACTIONS.NEXT) {
+         setShowVideoDialog(true);
+         setRun(false);
       }
-
-      setStepIndex(nextStepIndex);
     }
   }, [navigate, toast]);
 
@@ -113,6 +114,9 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     stepIndex,
     startOnboarding,
     handleJoyrideCallback,
+    proceedToNextStep,
+    showVideoDialog,
+    setShowVideoDialog,
   };
 
   return React.createElement(OnboardingContext.Provider, { value }, children);

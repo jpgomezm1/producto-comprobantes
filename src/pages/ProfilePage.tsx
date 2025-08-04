@@ -9,9 +9,11 @@ import { useProfile } from '@/hooks/useProfile';
 import { UserBankAccountFormData } from '@/types/profile';
 import { Plus, Trash2 } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { useOnboarding } from '@/hooks/useOnboarding';
 
 const ProfilePage = () => {
   const { loading, profile, accounts, addBankAccount, deleteBankAccount, getUserEmail } = useProfile();
+  const { proceedToNextStep } = useOnboarding();
   const [userEmail, setUserEmail] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState<UserBankAccountFormData>({
@@ -38,6 +40,7 @@ const ProfilePage = () => {
         account_number: '',
         account_holder_name: '',
       });
+      proceedToNextStep();
     }
   };
 

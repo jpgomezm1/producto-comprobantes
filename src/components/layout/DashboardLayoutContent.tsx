@@ -10,6 +10,7 @@ import { useComprobantesUsage } from "@/hooks/useComprobantesUsage";
 import { UsageMeter } from "@/components/onboarding/UsageMeter";
 import { useOnboarding } from "@/hooks/useOnboarding"; // Importa el hook consumidor
 import { OnboardingTour } from "@/components/onboarding/OnboardingTour";
+import { VideoTutorialDialog } from "@/components/onboarding/VideoTutorialDialog";
 
 interface UserProfile {
   full_name: string;
@@ -106,6 +107,7 @@ export const DashboardLayoutContent = ({ children }: DashboardLayoutContentProps
         stepIndex={stepIndex}
         handleJoyrideCallback={handleJoyrideCallback}
       />
+      <VideoTutorialDialog />
       <div className="flex h-screen w-full bg-background">
         <AnimatedSidebar open={sidebarOpen} setOpen={setSidebarOpen}>
           <SidebarBody className="justify-between gap-10 h-full">
