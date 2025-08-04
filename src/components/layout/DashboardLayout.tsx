@@ -55,7 +55,7 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin text-secondary-blue mx-auto mb-4" />
+          <Loader2 className="h-8 w-8 animate-spin text-purple-600 mx-auto mb-4" />
           <p className="text-muted-foreground">Cargando...</p>
         </div>
       </div>
@@ -87,8 +87,8 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
             {/* Logo */}
             <div className="flex items-center gap-3 py-6 px-2">
-              <div className="h-10 w-10 bg-blue-600 rounded-lg flex-shrink-0 flex items-center justify-center shadow-lg">
-                <FileText className="h-6 w-6 text-white" />
+              <div className="h-12 w-12 bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl flex-shrink-0 flex items-center justify-center shadow-lg">
+                <FileText className="h-7 w-7 text-white" />
               </div>
               <motion.div
                 animate={{
@@ -97,22 +97,22 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                 }}
                 className="whitespace-pre"
               >
-                <h1 className="font-bold text-white text-lg leading-tight">Sistema de</h1>
-                <p className="text-gray-300 text-sm">Comprobantes</p>
+                <h1 className="font-bold text-white text-xl leading-tight">Ya Quedo</h1>
+                <p className="text-purple-200 text-sm font-medium">Sistema de Comprobantes</p>
               </motion.div>
             </div>
             
             {/* Navigation Links */}
-            <div className="mt-4 flex flex-col gap-2 px-2">
+            <div className="mt-6 flex flex-col gap-2 px-2">
               {navigationItems.map((link, idx) => (
                 <SidebarLink 
                   key={idx} 
                   link={link} 
                   isActive={location.pathname === link.href}
                   className={`
-                    flex items-center justify-start gap-3 py-3 px-3 rounded-lg 
-                    transition-all duration-200 text-gray-300 hover:bg-gray-700 hover:text-white
-                    ${location.pathname === link.href ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg' : ''}
+                    flex items-center justify-start gap-3 py-3 px-3 rounded-xl 
+                    transition-all duration-200 text-purple-200 hover:bg-purple-700/50 hover:text-white
+                    ${location.pathname === link.href ? 'bg-purple-600 text-white hover:bg-purple-600 shadow-lg border border-purple-400/30' : ''}
                   `}
                 />
               ))}
@@ -120,21 +120,25 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           </div>
           
           {/* User Section */}
-          <div className="border-t border-gray-600 pt-4 px-2">
+          <div className="border-t border-purple-700/50 pt-6 px-2">
             {/* Información del usuario */}
             {profile && sidebarOpen && (
-              <div className="mb-4 p-3 bg-gray-700/50 rounded-lg">
-                <div className="flex items-start gap-2 mb-3">
-                  <User className="h-4 w-4 text-gray-300 mt-0.5 flex-shrink-0" />
+              <div className="mb-6 p-4 bg-gradient-to-r from-purple-700/30 to-purple-600/30 rounded-xl border border-purple-600/20">
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
+                    <User className="h-4 w-4 text-white" />
+                  </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-white truncate">{profile.full_name}</p>
-                    <p className="text-xs text-gray-400">ID: {profile.user_id_card}</p>
+                    <p className="text-sm font-semibold text-white truncate">{profile.full_name}</p>
+                    <p className="text-xs text-purple-200">ID: {profile.user_id_card}</p>
                   </div>
                 </div>
-                <div className="flex items-start gap-2">
-                  <Building className="h-4 w-4 text-gray-300 mt-0.5 flex-shrink-0" />
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Building className="h-4 w-4 text-white" />
+                  </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm text-gray-300 truncate">{profile.business_name}</p>
+                    <p className="text-sm text-purple-100 truncate font-medium">{profile.business_name}</p>
                   </div>
                 </div>
               </div>
@@ -142,7 +146,7 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             
             <div 
               onClick={handleLogout}
-              className="flex items-center justify-start gap-3 py-3 px-3 rounded-lg hover:bg-red-600 hover:text-white text-gray-300 transition-all duration-200 cursor-pointer group"
+              className="flex items-center justify-start gap-3 py-3 px-3 rounded-xl hover:bg-red-600 hover:text-white text-purple-200 transition-all duration-200 cursor-pointer group mb-4"
             >
               <div className="h-5 w-5 flex-shrink-0">
                 <LogOut className="h-5 w-5" />
@@ -158,17 +162,26 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
               </motion.span>
             </div>
             
-            {/* Footer info */}
+            {/* Footer info with Logo */}
             <motion.div
               animate={{
                 display: sidebarOpen ? "block" : "none",
                 opacity: sidebarOpen ? 1 : 0,
               }}
-              className="mt-4 pt-3 border-t border-gray-600"
+              className="pt-4 border-t border-purple-700/50"
             >
-              <div className="text-xs text-gray-400 text-center space-y-1">
-                <p className="font-medium">© 2025</p>
-                <p className="text-gray-500">v1.0.0</p>
+              <div className="text-center space-y-3">
+                <div className="flex items-center justify-center gap-2">
+                  <img 
+                    src="https://storage.googleapis.com/cluvi/nuevo_irre-removebg-preview.png" 
+                    alt="Irrelevant Logo" 
+                    className="h-6 w-auto opacity-80"
+                  />
+                </div>
+                <div className="text-xs text-purple-400 space-y-1">
+                  <p className="font-medium">© 2025</p>
+                  <p className="text-purple-500">v1.0.0</p>
+                </div>
               </div>
             </motion.div>
           </div>

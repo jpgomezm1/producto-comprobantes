@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import React, { useState, createContext, useContext } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, X, FileText } from "lucide-react";
 
 interface Links {
   label: string;
@@ -90,11 +90,11 @@ export const DesktopSidebar = ({
   return (
     <motion.div
       className={cn(
-        "h-screen px-2 py-4 hidden md:flex md:flex-col w-[300px] flex-shrink-0 bg-gray-800",
+        "h-screen px-4 py-6 hidden md:flex md:flex-col w-[320px] flex-shrink-0 bg-gradient-to-b from-gray-900 via-purple-900 to-gray-900 shadow-2xl",
         className
       )}
       animate={{
-        width: animate ? (open ? "300px" : "70px") : "300px",
+        width: animate ? (open ? "320px" : "80px") : "320px",
       }}
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
@@ -116,13 +116,18 @@ export const MobileSidebar = ({
     <>
       <div
         className={cn(
-          "h-16 px-4 py-4 flex flex-row md:hidden items-center justify-between w-full bg-gray-800"
+          "h-16 px-4 py-4 flex flex-row md:hidden items-center justify-between w-full bg-gradient-to-r from-gray-900 to-purple-900 shadow-lg"
         )}
       >
         <div className="flex justify-between items-center w-full">
-          <h1 className="text-white font-semibold">Sistema de Comprobantes</h1>
+          <div className="flex items-center gap-3">
+            <div className="h-8 w-8 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center">
+              <FileText className="h-5 w-5 text-white" />
+            </div>
+            <h1 className="text-white font-bold text-lg">Ya Quedo</h1>
+          </div>
           <Menu
-            className="text-white cursor-pointer"
+            className="text-white cursor-pointer hover:text-purple-200 transition-colors"
             onClick={() => setOpen(!open)}
           />
         </div>
@@ -137,12 +142,12 @@ export const MobileSidebar = ({
                 ease: "easeInOut",
               }}
               className={cn(
-                "fixed h-full w-full inset-0 p-10 z-[100] flex flex-col justify-between bg-gray-800",
+                "fixed h-full w-full inset-0 p-10 z-[100] flex flex-col justify-between bg-gradient-to-b from-gray-900 via-purple-900 to-gray-900",
                 className
               )}
             >
               <div
-                className="absolute right-6 top-6 z-50 text-white cursor-pointer"
+                className="absolute right-6 top-6 z-50 text-white cursor-pointer hover:text-purple-200 transition-colors"
                 onClick={() => setOpen(!open)}
               >
                 <X />
@@ -171,19 +176,19 @@ export const SidebarLink = ({
     <Link
       to={link.href}
       className={cn(
-        "flex items-center rounded-lg transition-all duration-200 outline-none focus:outline-none focus:ring-0",
+        "flex items-center rounded-xl transition-all duration-200 outline-none focus:outline-none focus:ring-0 group",
         open 
           ? "justify-start gap-3 py-3 px-3" 
           : "justify-center py-3 px-2",
         isActive 
-          ? "bg-blue-600 text-white hover:bg-blue-700" 
-          : "text-gray-300 hover:bg-gray-700 hover:text-white",
+          ? "bg-purple-600 text-white hover:bg-purple-600 shadow-lg" 
+          : "text-purple-200 hover:bg-purple-700/50 hover:text-white",
         className
       )}
       {...props}
     >
       <div className={cn(
-        "flex-shrink-0",
+        "flex-shrink-0 transition-transform duration-200 group-hover:scale-110",
         open ? "h-5 w-5" : "h-6 w-6"
       )}>
         {link.icon}
