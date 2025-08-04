@@ -12,14 +12,51 @@ import {
 export const ProfileSetupStep = () => {
   const { isStepActive } = useAppOnboarding();
   const [isVisible, setIsVisible] = useState(false);
+  const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
 
   useEffect(() => {
     if (isStepActive('profile-setup')) {
-      // Delay to allow navigation to complete
-      const timer = setTimeout(() => setIsVisible(true), 500);
-      return () => clearTimeout(timer);
+      let searchInterval: NodeJS.Timeout;
+      let resizeObserver: ResizeObserver;
+
+      // Paso A: Espera activa del elemento
+      const findAndPositionTarget = () => {
+        const targetElement = document.querySelector('[data-tour-id="add-account-button"]') as HTMLElement;
+        
+        if (targetElement) {
+          // Paso B: Posiciona y observa
+          clearInterval(searchInterval);
+          
+          // Calcula la posición del elemento
+          const rect = targetElement.getBoundingClientRect();
+          setTargetRect(rect);
+          setIsVisible(true);
+          
+          // Crea ResizeObserver para vigilar cambios
+          resizeObserver = new ResizeObserver(() => {
+            const newRect = targetElement.getBoundingClientRect();
+            setTargetRect(newRect);
+          });
+          resizeObserver.observe(targetElement);
+        }
+      };
+
+      // Buscar elemento cada 100ms
+      searchInterval = setInterval(findAndPositionTarget, 100);
+      
+      // Intentar encontrar el elemento inmediatamente también
+      findAndPositionTarget();
+
+      // Paso C: Limpieza
+      return () => {
+        clearInterval(searchInterval);
+        if (resizeObserver) {
+          resizeObserver.disconnect();
+        }
+      };
     } else {
       setIsVisible(false);
+      setTargetRect(null);
     }
   }, [isStepActive]);
 
@@ -27,7 +64,7 @@ export const ProfileSetupStep = () => {
 
   return (
     <AnimatePresence>
-      {isVisible && (
+      {isVisible && targetRect && (
         <>
           {/* Backdrop overlay */}
           <motion.div
@@ -44,14 +81,14 @@ export const ProfileSetupStep = () => {
             exit={{ opacity: 0 }}
             className="fixed z-50"
             style={{
-              // Position relative to the add account button
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
+              top: targetRect.top - 8,
+              left: targetRect.left - 8,
+              width: targetRect.width + 16,
+              height: targetRect.height + 16,
             }}
           >
-            <div className="absolute -inset-2 bg-secondary-blue/20 rounded-xl animate-pulse" />
-            <div className="absolute -inset-1 border-2 border-secondary-blue rounded-xl animate-pulse" />
+            <div className="absolute inset-0 bg-secondary-blue/20 rounded-xl animate-pulse" />
+            <div className="absolute inset-0 border-2 border-secondary-blue rounded-xl animate-pulse" />
           </motion.div>
 
           {/* Tooltip card */}
@@ -62,9 +99,8 @@ export const ProfileSetupStep = () => {
             transition={{ type: "spring", duration: 0.5 }}
             className="fixed z-50 max-w-sm"
             style={{
-              // Position the tooltip near the button
-              top: '60%',
-              left: '50%',
+              top: targetRect.bottom + 16,
+              left: targetRect.left + targetRect.width / 2,
               transform: 'translateX(-50%)',
             }}
           >
