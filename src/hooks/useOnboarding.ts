@@ -1,15 +1,23 @@
+// src/hooks/useOnboarding.ts
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { Step, CallBackProps, STATUS, EVENTS, ACTIONS } from 'react-joyride';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-export interface OnboardingContextType {
+// 1. Definir la forma del contexto
+interface OnboardingContextType {
+  run: boolean;
+  stepIndex: number;
+  steps: Step[];
   startOnboarding: () => void;
+  handleJoyrideCallback: (data: CallBackProps) => void;
 }
 
+// 2. Crear el contexto
 const OnboardingContext = createContext<OnboardingContextType | undefined>(undefined);
 
+// 3. Crear el hook para consumir el contexto
 export const useOnboarding = () => {
   const context = useContext(OnboardingContext);
   if (!context) {
@@ -18,7 +26,8 @@ export const useOnboarding = () => {
   return context;
 };
 
-export const useOnboardingProvider = () => {
+// 4. Crear el componente Provider que contendrá toda la lógica y el estado
+export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [run, setRun] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const navigate = useNavigate();
@@ -33,20 +42,20 @@ export const useOnboardingProvider = () => {
     },
     {
       target: '[data-tour-id="profile-link"]',
-      content: 'Para empezar, vamos a tu perfil para que añadas una cuenta bancaria de recaudo.',
+      content: 'Para empezar, haz clic en "Mi Perfil" para añadir tu cuenta bancaria de recaudo.',
       spotlightClicks: true,
     },
     {
       target: '[data-tour-id="add-account-button"]',
-      content: '¡Excelente! Ahora, haz clic aquí para registrar tu primera cuenta bancaria. Esto nos ayudará a validar tus comprobantes.',
+      content: '¡Excelente! Ahora, haz clic aquí para registrar tu primera cuenta. Esto nos ayudará a validar tus comprobantes.',
       spotlightClicks: true,
       placement: 'bottom',
     },
     {
-        target: 'body',
-        content: '¡Fantástico! Has configurado tu primera cuenta. Ahora puedes volver al dashboard para ver tus estadísticas.',
-        placement: 'center',
-        disableBeacon: true,
+      target: 'body',
+      content: '¡Fantástico! Has configurado tu primera cuenta. Ahora puedes volver al dashboard para ver tus estadísticas.',
+      placement: 'center',
+      disableBeacon: true,
     },
     {
       target: '[data-tour-id="dashboard-stats"]',
@@ -56,7 +65,7 @@ export const useOnboardingProvider = () => {
   ];
 
   const handleJoyrideCallback = useCallback(async (data: CallBackProps) => {
-    const { action, index, status, type, step } = data;
+    const { action, index, status, type } = data;
 
     if (([STATUS.FINISHED, STATUS.SKIPPED] as string[]).includes(status)) {
       setRun(false);
@@ -79,17 +88,14 @@ export const useOnboardingProvider = () => {
       return;
     }
 
-    if (([EVENTS.STEP_AFTER, EVENTS.TARGET_NOT_FOUND] as string[]).includes(type)) {
+    if (([EVENTS.STEP_AFTER] as string[]).includes(type)) {
       const nextStepIndex = index + (action === ACTIONS.PREV ? -1 : 1);
-
-      if (action === ACTIONS.NEXT) {
-        if (step.target === '[data-tour-id="profile-link"]') {
-          navigate('/profile');
-        } else if (index === 3) { // Después del paso del video/mensaje
-          navigate('/dashboard');
-        }
-      }
       
+      // Manejo de navegación explícita solo cuando es necesario
+      if (index === 3 && action === ACTIONS.NEXT) {
+        navigate('/dashboard');
+      }
+
       setStepIndex(nextStepIndex);
     }
   }, [navigate, toast]);
@@ -101,12 +107,13 @@ export const useOnboardingProvider = () => {
     }
   }, [run]);
 
-  return { run, stepIndex, tourSteps, handleJoyrideCallback, startOnboarding };
-};
+  const value = {
+    run,
+    steps: tourSteps,
+    stepIndex,
+    startOnboarding,
+    handleJoyrideCallback,
+  };
 
-export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const value = {
-        startOnboarding: () => {}
-    };
-    return React.createElement(OnboardingContext.Provider, { value }, children);
-}
+  return React.createElement(OnboardingContext.Provider, { value }, children);
+};

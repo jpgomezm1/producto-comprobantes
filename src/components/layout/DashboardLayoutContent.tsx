@@ -4,11 +4,11 @@ import { DashboardHeader } from "./DashboardHeader";
 import { AnimatedSidebar, SidebarBody, SidebarLink } from "@/components/ui/motion-sidebar";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Home, FileText, User, LogOut, Building } from "lucide-react";
+import { Loader2, Home, User, LogOut, Building, FileText } from "lucide-react";
 import { motion } from "framer-motion";
 import { useComprobantesUsage } from "@/hooks/useComprobantesUsage";
 import { UsageMeter } from "@/components/onboarding/UsageMeter";
-import { useOnboardingProvider } from "@/hooks/useOnboarding";
+import { useOnboarding } from "@/hooks/useOnboarding"; // Importa el hook consumidor
 import { OnboardingTour } from "@/components/onboarding/OnboardingTour";
 
 interface UserProfile {
@@ -32,12 +32,13 @@ export const DashboardLayoutContent = ({ children }: DashboardLayoutContentProps
   const { currentUsage, limit, isUnlimited, loading: usageLoading } = useComprobantesUsage(profile?.selected_plan || 'basico');
   const [onboardingStatusChecked, setOnboardingStatusChecked] = useState(false);
   
-  const { run, stepIndex, tourSteps, handleJoyrideCallback, startOnboarding } = useOnboardingProvider();
+  // Usa el hook para consumir el estado global del onboarding
+  const { run, stepIndex, steps, handleJoyrideCallback, startOnboarding } = useOnboarding();
 
   useEffect(() => {
     const fetchProfile = async () => {
       if (user && !onboardingStatusChecked) {
-        setOnboardingStatusChecked(true);
+        setOnboardingStatusChecked(true); // Previene que se ejecute múltiples veces
         const { data, error } = await supabase
           .from('profiles')
           .select('full_name, business_name, user_id_card, selected_plan, onboarding_completed')
@@ -47,7 +48,7 @@ export const DashboardLayoutContent = ({ children }: DashboardLayoutContentProps
         if (data && !error) {
           setProfile(data);
           if (!data.onboarding_completed) {
-            startOnboarding();
+            setTimeout(() => startOnboarding(), 500); // Inicia el tour si no está completado
           }
         }
       }
@@ -101,7 +102,7 @@ export const DashboardLayoutContent = ({ children }: DashboardLayoutContentProps
     <>
       <OnboardingTour 
         run={run}
-        steps={tourSteps}
+        steps={steps}
         stepIndex={stepIndex}
         handleJoyrideCallback={handleJoyrideCallback}
       />
