@@ -89,13 +89,24 @@ const Dashboard = () => {
   // 3. (CRUCIAL) Memoización para recalcular las estadísticas para las `StatsCards` basadas en los datos ya filtrados.
   const filteredStats = useMemo(() => {
     if (!filteredComprobantes) {
-      return { totalComprobantes: 0, comprobantesValidos: 0, montoTotal: 0 };
+      return { totalComprobantes: 0, comprobantesValidos: 0, montoTotal: 0, bancoMasUsado: "N/A" };
     }
     const comprobantesValidosFiltrados = filteredComprobantes.filter(c => c.es_valido);
+    
+    // Calcular banco más usado
+    const bancoCounts: Record<string, number> = {};
+    filteredComprobantes.forEach(c => {
+      bancoCounts[c.banco_emisor] = (bancoCounts[c.banco_emisor] || 0) + 1;
+    });
+    const bancoMasUsado = Object.keys(bancoCounts).reduce((a, b) => 
+      bancoCounts[a] > bancoCounts[b] ? a : b, "N/A"
+    );
+    
     return {
       totalComprobantes: filteredComprobantes.length,
       comprobantesValidos: comprobantesValidosFiltrados.length,
       montoTotal: comprobantesValidosFiltrados.reduce((sum, c) => sum + Number(c.valor_transferencia), 0),
+      bancoMasUsado
     };
   }, [filteredComprobantes]);
 
@@ -268,26 +279,9 @@ const Dashboard = () => {
                         </TableCell>
                         <TableCell className="py-4">
                           <div className="flex justify-center">
-                            {comprobante.imagen_url ? (
-                              <div 
-                                className="relative group cursor-pointer"
-                                onClick={() => handleImageView(comprobante.imagen_url)}
-                              >
-                                <div className="w-16 h-12 rounded-lg overflow-hidden border-2 border-gray-200 hover:border-purple-400 transition-all duration-200 hover:shadow-md">
-                                  <ImagePreview 
-                                    imageUrl={comprobante.imagen_url} 
-                                    alt={`Comprobante ${comprobante.numero_comprobante || index + 1}`}
-                                  />
-                                </div>
-                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
-                                  <ZoomIn className="w-4 h-4 text-white" />
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="w-16 h-12 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-gray-200">
-                                <ImageIcon className="w-4 h-4 text-gray-400" />
-                              </div>
-                            )}
+                            <div className="w-16 h-12 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-gray-200">
+                              <ImageIcon className="w-4 h-4 text-gray-400" />
+                            </div>
                           </div>
                         </TableCell>
                         <TableCell className="py-4">

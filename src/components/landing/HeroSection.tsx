@@ -7,27 +7,26 @@ export const HeroSection = () => {
     <section id="inicio" className="bg-gradient-hero py-20 px-4">
       <div className="container mx-auto max-w-6xl text-center">
         {/* Título principal */}
-        <h2 className="text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
-          Gestiona tus Comprobantes 
+        <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
+          Tus comprobantes en orden.
           <br />
-          <span className="text-secondary-blue">Bancarios de Forma Profesional</span>
-        </h2>
+          <span className="text-secondary-blue">Tu negocio, más claro que nunca.</span>
+        </h1>
 
         {/* Subtítulo */}
-        <p className="text-xl text-muted-foreground mb-10 max-w-3xl mx-auto leading-relaxed">
-          Organiza, valida y controla todos tus comprobantes bancarios desde una 
-          plataforma segura y eficiente. Simplifica tu gestión financiera con herramientas profesionales.
+        <p className="text-xl text-muted-foreground mb-10 max-w-4xl mx-auto leading-relaxed">
+          Con Ya Quedo, dejas de perder tiempo buscando recibos y empiezas a tomar el control de tus finanzas. 
+          Centraliza, valida y analiza tus transacciones en minutos.
         </p>
 
         {/* CTA Button */}
         <Button 
-          variant="blue" 
           size="lg"
-          className="mb-16 group"
+          className="mb-16 group bg-secondary-blue hover:bg-secondary-blue/90 text-lg px-8 py-4 h-auto"
           asChild
         >
           <Link to="/register">
-            Comenzar Gratis
+            Crear mi cuenta gratis
             <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
           </Link>
         </Button>
