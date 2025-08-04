@@ -29,22 +29,11 @@ export const useAuth = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signIn = async (userIdCard: string, password: string) => {
+  const signIn = async (email: string, password: string) => {
     try {
       setLoading(true);
-      
-      // 1. Obtener el email usando la Edge Function
-      const { data: userData, error: userError } = await supabase.functions.invoke('login-with-id-card', {
-        body: { user_id_card: userIdCard }
-      });
-
-      if (userError || !userData?.email) {
-        throw new Error(userData?.error || 'ID de usuario no encontrado');
-      }
-
-      // 2. Hacer login con el email obtenido
       const { error } = await supabase.auth.signInWithPassword({
-        email: userData.email,
+        email,
         password,
       });
 
@@ -61,9 +50,7 @@ export const useAuth = () => {
     } catch (error: any) {
       const errorMessage = 
         error.message === 'Invalid login credentials' 
-          ? 'Credenciales inválidas. Verifica tu ID y contraseña.'
-          : error.message === 'ID de usuario no encontrado'
-          ? 'ID de usuario no encontrado. Verifica tu información.'
+          ? 'Credenciales inválidas. Verifica tu email y contraseña.'
           : 'Error al iniciar sesión. Inténtalo de nuevo.';
       
       toast({
@@ -78,7 +65,7 @@ export const useAuth = () => {
     }
   };
 
-  const signUp = async (email: string, password: string, fullName: string, userIdCard: string) => {
+  const signUp = async (email: string, password: string, fullName: string, userIdCard: string, businessName: string) => {
     try {
       setLoading(true);
       const redirectUrl = `${window.location.origin}/`;
@@ -91,6 +78,7 @@ export const useAuth = () => {
           data: {
             full_name: fullName,
             user_id_card: userIdCard,
+            business_name: businessName,
           }
         }
       });

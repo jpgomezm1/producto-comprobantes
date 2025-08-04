@@ -3,8 +3,15 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { DashboardHeader } from "./DashboardHeader";
 import { AnimatedSidebar, SidebarBody, SidebarLink } from "@/components/ui/motion-sidebar";
 import { useAuth } from "@/hooks/useAuth";
-import { Loader2, Home, FileText, User, LogOut } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { Loader2, Home, FileText, User, LogOut, Building } from "lucide-react";
 import { motion } from "framer-motion";
+
+interface UserProfile {
+  full_name: string;
+  business_name: string;
+  user_id_card: string;
+}
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -12,9 +19,29 @@ interface DashboardLayoutProps {
 
 export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Cargar perfil del usuario
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (user) {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('full_name, business_name, user_id_card')
+          .eq('user_id', user.id)
+          .single();
+
+        if (data && !error) {
+          setProfile(data);
+        }
+      }
+    };
+
+    fetchProfile();
+  }, [user]);
 
   // Proteger rutas - redirigir si no está autenticado
   useEffect(() => {
@@ -94,16 +121,24 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           
           {/* User Section */}
           <div className="border-t border-gray-600 pt-4 px-2">
-            <div className="mb-3">
-              <SidebarLink
-                link={{
-                  label: user.email || "Usuario",
-                  href: "/profile",
-                  icon: <User className="h-5 w-5" />,
-                }}
-                className="flex items-center justify-start gap-3 py-3 px-3 rounded-lg transition-all duration-200 text-gray-300 hover:bg-gray-700 hover:text-white"
-              />
-            </div>
+            {/* Información del usuario */}
+            {profile && sidebarOpen && (
+              <div className="mb-4 p-3 bg-gray-700/50 rounded-lg">
+                <div className="flex items-start gap-2 mb-3">
+                  <User className="h-4 w-4 text-gray-300 mt-0.5 flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-white truncate">{profile.full_name}</p>
+                    <p className="text-xs text-gray-400">ID: {profile.user_id_card}</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <Building className="h-4 w-4 text-gray-300 mt-0.5 flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm text-gray-300 truncate">{profile.business_name}</p>
+                  </div>
+                </div>
+              </div>
+            )}
             
             <div 
               onClick={handleLogout}

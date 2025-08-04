@@ -79,6 +79,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          business_name: string
           created_at: string
           full_name: string
           id: string
@@ -87,6 +88,7 @@ export type Database = {
           user_id_card: string
         }
         Insert: {
+          business_name?: string
           created_at?: string
           full_name: string
           id?: string
@@ -95,6 +97,7 @@ export type Database = {
           user_id_card: string
         }
         Update: {
+          business_name?: string
           created_at?: string
           full_name?: string
           id?: string

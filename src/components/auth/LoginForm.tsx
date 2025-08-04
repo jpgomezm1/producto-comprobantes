@@ -9,7 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
 
 export const LoginForm = () => {
-  const [userIdCard, setUserIdCard] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -27,7 +27,7 @@ export const LoginForm = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    const { error } = await signIn(userIdCard, password);
+    const { error } = await signIn(email, password);
     
     if (!error) {
       navigate("/dashboard");
@@ -59,15 +59,15 @@ export const LoginForm = () => {
 
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* ID (Cédula) */}
+            {/* Email */}
             <div className="space-y-2">
-              <Label htmlFor="userIdCard">ID (Cédula)</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
-                id="userIdCard"
-                type="text"
-                placeholder="12345678"
-                value={userIdCard}
-                onChange={(e) => setUserIdCard(e.target.value)}
+                id="email"
+                type="email"
+                placeholder="tu@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={isLoading}
               />
