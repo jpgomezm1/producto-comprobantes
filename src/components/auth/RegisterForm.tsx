@@ -3,10 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, Eye, EyeOff, Loader2, Check, X } from "lucide-react";
+import { FileText, Eye, EyeOff, Loader2, Check, X, Info } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export const RegisterForm = () => {
   const [formData, setFormData] = useState({
@@ -62,6 +63,7 @@ export const RegisterForm = () => {
   const isFormValid = formData.fullName && isUserIdCardValid && isEmailValid && isPasswordValid && isPasswordMatching;
 
   return (
+    <TooltipProvider>
     <div className="min-h-screen bg-gradient-hero flex items-center justify-center px-4">
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="text-center space-y-4">
@@ -101,7 +103,17 @@ export const RegisterForm = () => {
 
             {/* ID (Cédula) */}
             <div className="space-y-2">
-              <Label htmlFor="userIdCard">ID (Cédula)</Label>
+              <div className="flex items-center gap-2">
+                <Label htmlFor="userIdCard">ID (Cédula)</Label>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Este ID se usará para asociar tus comprobantes de forma única.</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
               <div className="relative">
                 <Input
                   id="userIdCard"
@@ -266,5 +278,6 @@ export const RegisterForm = () => {
         </CardContent>
       </Card>
     </div>
+    </TooltipProvider>
   );
 };
