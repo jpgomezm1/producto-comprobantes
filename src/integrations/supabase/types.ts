@@ -95,6 +95,8 @@ export type Database = {
           created_at: string
           full_name: string
           id: string
+          onboarding_completed: boolean
+          selected_plan: string
           updated_at: string
           user_id: string
           user_id_card: string
@@ -104,6 +106,8 @@ export type Database = {
           created_at?: string
           full_name: string
           id?: string
+          onboarding_completed?: boolean
+          selected_plan?: string
           updated_at?: string
           user_id: string
           user_id_card: string
@@ -113,6 +117,8 @@ export type Database = {
           created_at?: string
           full_name?: string
           id?: string
+          onboarding_completed?: boolean
+          selected_plan?: string
           updated_at?: string
           user_id?: string
           user_id_card?: string

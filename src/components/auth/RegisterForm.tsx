@@ -4,10 +4,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText, Eye, EyeOff, Loader2, Check, X, Info } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Badge } from "@/components/ui/badge";
 
 export const RegisterForm = () => {
   const [formData, setFormData] = useState({
@@ -23,6 +24,8 @@ export const RegisterForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { signUp, user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const selectedPlan = searchParams.get('plan') || 'basico';
 
   // Redirigir si ya está autenticado
   useEffect(() => {
@@ -59,7 +62,8 @@ export const RegisterForm = () => {
       formData.password, 
       formData.fullName, 
       formData.userIdCard, 
-      formData.businessName
+      formData.businessName,
+      selectedPlan
     );
     
     if (!error) {
@@ -96,6 +100,13 @@ export const RegisterForm = () => {
             <CardDescription className="text-muted-foreground">
               Únete y comienza a gestionar tus comprobantes bancarios
             </CardDescription>
+            {selectedPlan !== 'basico' && (
+              <div className="mt-3 flex justify-center">
+                <Badge variant="secondary" className="bg-secondary-blue text-white">
+                  Plan seleccionado: {selectedPlan === 'profesional' ? 'Profesional' : 'Negocios'}
+                </Badge>
+              </div>
+            )}
           </div>
         </CardHeader>
 

@@ -65,7 +65,7 @@ export const useAuth = () => {
     }
   };
 
-  const signUp = async (email: string, password: string, fullName: string, userIdCard: string, businessName: string) => {
+  const signUp = async (email: string, password: string, fullName: string, userIdCard: string, businessName: string, plan: string = 'basico') => {
     try {
       setLoading(true);
       const redirectUrl = `${window.location.origin}/`;
@@ -79,6 +79,7 @@ export const useAuth = () => {
             full_name: fullName,
             user_id_card: userIdCard,
             business_name: businessName,
+            plan: plan
           }
         }
       });

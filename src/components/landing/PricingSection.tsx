@@ -111,6 +111,11 @@ export const PricingSection = () => {
                       : 'bg-primary hover:bg-primary/90'
                   }`}
                   size="lg"
+                  onClick={() => {
+                    const planParam = plan.name === "Plan Básico" ? "basico" : 
+                                    plan.name === "Plan Profesional" ? "profesional" : "negocios";
+                    window.location.href = `/register?plan=${planParam}`;
+                  }}
                 >
                   {plan.buttonText}
                 </Button>
