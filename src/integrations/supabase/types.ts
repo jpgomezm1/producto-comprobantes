@@ -14,7 +14,69 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      comprobantes: {
+        Row: {
+          banco_emisor: string
+          beneficiario: string | null
+          created_at: string
+          cuenta_destino: string | null
+          cuenta_origen: string | null
+          es_valido: boolean | null
+          estado_transaccion: string | null
+          fecha: string
+          hora: string | null
+          id: string
+          moneda: string | null
+          numero_comprobante: string | null
+          numero_referencia: string | null
+          observaciones: string | null
+          tipo_comprobante: string | null
+          updated_at: string
+          user_id: string | null
+          valor_transferencia: number
+        }
+        Insert: {
+          banco_emisor: string
+          beneficiario?: string | null
+          created_at?: string
+          cuenta_destino?: string | null
+          cuenta_origen?: string | null
+          es_valido?: boolean | null
+          estado_transaccion?: string | null
+          fecha: string
+          hora?: string | null
+          id?: string
+          moneda?: string | null
+          numero_comprobante?: string | null
+          numero_referencia?: string | null
+          observaciones?: string | null
+          tipo_comprobante?: string | null
+          updated_at?: string
+          user_id?: string | null
+          valor_transferencia: number
+        }
+        Update: {
+          banco_emisor?: string
+          beneficiario?: string | null
+          created_at?: string
+          cuenta_destino?: string | null
+          cuenta_origen?: string | null
+          es_valido?: boolean | null
+          estado_transaccion?: string | null
+          fecha?: string
+          hora?: string | null
+          id?: string
+          moneda?: string | null
+          numero_comprobante?: string | null
+          numero_referencia?: string | null
+          observaciones?: string | null
+          tipo_comprobante?: string | null
+          updated_at?: string
+          user_id?: string | null
+          valor_transferencia?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
