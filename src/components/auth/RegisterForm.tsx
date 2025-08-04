@@ -23,18 +23,18 @@ export const RegisterForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { signUp, user } = useAuth();
+  const { signUp, user, signOut } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const urlPlan = searchParams.get('plan') || 'basico';
   const [selectedPlan, setSelectedPlan] = useState(urlPlan);
 
-  // Redirigir si ya está autenticado
+  // Cerrar sesión existente para permitir nuevo registro
   useEffect(() => {
     if (user) {
-      navigate("/dashboard");
+      signOut();
     }
-  }, [user, navigate]);
+  }, [user, signOut]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
