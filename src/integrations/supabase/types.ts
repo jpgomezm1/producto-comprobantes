@@ -26,6 +26,10 @@ export type Database = {
           fecha: string
           hora: string | null
           id: string
+          imagen_filename: string | null
+          imagen_gcs_path: string | null
+          imagen_size_bytes: number | null
+          imagen_url: string | null
           moneda: string | null
           numero_comprobante: string | null
           numero_referencia: string | null
@@ -46,6 +50,10 @@ export type Database = {
           fecha: string
           hora?: string | null
           id?: string
+          imagen_filename?: string | null
+          imagen_gcs_path?: string | null
+          imagen_size_bytes?: number | null
+          imagen_url?: string | null
           moneda?: string | null
           numero_comprobante?: string | null
           numero_referencia?: string | null
@@ -66,6 +74,10 @@ export type Database = {
           fecha?: string
           hora?: string | null
           id?: string
+          imagen_filename?: string | null
+          imagen_gcs_path?: string | null
+          imagen_size_bytes?: number | null
+          imagen_url?: string | null
           moneda?: string | null
           numero_comprobante?: string | null
           numero_referencia?: string | null
@@ -104,6 +116,33 @@ export type Database = {
           updated_at?: string
           user_id?: string
           user_id_card?: string
+        }
+        Relationships: []
+      }
+      user_bank_accounts: {
+        Row: {
+          account_holder_name: string
+          account_nickname: string
+          account_number: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          account_holder_name: string
+          account_nickname: string
+          account_number: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          account_holder_name?: string
+          account_nickname?: string
+          account_number?: string
+          created_at?: string
+          id?: string
+          user_id?: string
         }
         Relationships: []
       }
