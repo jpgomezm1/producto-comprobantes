@@ -5,15 +5,30 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
+// Define el contenido del video como string HTML
+const getVideoStepContent = () => `
+  <div style="text-align: center;">
+    <h2 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;">Carga comprobantes en segundos con Telegram</h2>
+    <p style="margin-bottom: 1rem;">La forma más fácil de registrar tus comprobantes es a través de nuestro bot de Telegram.</p>
+    <div style="aspect-ratio: 16/9; width: 100%; background: #f1f5f9; border-radius: 0.5rem; overflow: hidden; margin-bottom: 1rem;">
+      <iframe
+        src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+        title="Tutorial Telegram Ya Quedo"
+        style="width: 100%; height: 100%;"
+        allowfullscreen>
+      </iframe>
+    </div>
+  </div>
+`;
+
 interface OnboardingContextType {
   run: boolean;
   stepIndex: number;
   steps: Step[];
   startOnboarding: () => void;
-  proceedToNextStep: () => void;
+  goToStep: (index: number) => void;
   handleJoyrideCallback: (data: CallBackProps) => void;
-  showVideoDialog: boolean;
-  setShowVideoDialog: (show: boolean) => void;
+  isCompleted: boolean;
 }
 
 const OnboardingContext = createContext<OnboardingContextType | undefined>(undefined);
@@ -29,7 +44,7 @@ export const useOnboarding = () => {
 export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [run, setRun] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
-  const [showVideoDialog, setShowVideoDialog] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -47,19 +62,26 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     },
     {
       target: '[data-tour-id="add-account-button"]',
-      content: '¡Excelente! Ahora, añade tu primera cuenta. El tour continuará automáticamente cuando guardes la cuenta.',
-      spotlightClicks: true,
+      content: '¡Excelente! Ahora, añade tu primera cuenta. El tour se pausará y continuará automáticamente cuando guardes la cuenta.',
       placement: 'right',
+      spotlightClicks: true,
+      // Ocultamos los botones de Joyride para forzar la acción del usuario
+      hideFooter: true, 
+    },
+    {
+      target: 'body',
+      placement: 'center',
+      content: getVideoStepContent(),
     },
     {
       target: '[data-tour-id="dashboard-stats"]',
-      content: '¡Todo listo! Este es tu Dashboard. A medida que cargues comprobantes, aquí verás tus estadísticas en tiempo real.',
+      content: '¡Todo listo! Este es tu Dashboard. A medida que cargues comprobantes, aquí verás tus estadísticas.',
       placement: 'bottom',
     },
   ];
   
-  const proceedToNextStep = useCallback(() => {
-    setStepIndex(3);
+  const goToStep = useCallback((index: number) => {
+    setStepIndex(index);
     setRun(true);
   }, []);
 
@@ -68,7 +90,6 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
     if (([STATUS.FINISHED, STATUS.SKIPPED] as string[]).includes(status)) {
       setRun(false);
-      setStepIndex(0);
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
@@ -76,6 +97,9 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
             .from('profiles')
             .update({ onboarding_completed: true })
             .eq('user_id', user.id);
+          
+          setIsCompleted(true); // Notifica a la app que el tour terminó
+          
           toast({
             title: "¡Onboarding Completado!",
             description: "Ya estás listo para usar Ya Quedo al máximo.",
@@ -88,15 +112,21 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
 
     if (type === EVENTS.STEP_AFTER) {
-      if (index === 0 && action === ACTIONS.NEXT) {
+      const nextStepIndex = index + (action === ACTIONS.PREV ? -1 : 1);
+
+      if (index === 0 && action === ACTIONS.NEXT) { // Después de bienvenida
         navigate('/dashboard');
-        setStepIndex(1);
-      } else if (index === 1 && action === ACTIONS.NEXT) {
+        setStepIndex(nextStepIndex);
+      } else if (index === 1 && action === ACTIONS.NEXT) { // Después de clic en perfil
         navigate('/profile');
-        setStepIndex(2);
-      } else if (index === 2 && action === ACTIONS.NEXT) {
-         setShowVideoDialog(true);
-         setRun(false);
+        setStepIndex(nextStepIndex);
+      } else if (index === 2) { // El paso de "Añadir cuenta" no tiene botones, no hará nada.
+        return;
+      } else if (index === 3 && action === ACTIONS.NEXT) { // Después del video
+        navigate('/dashboard');
+        setStepIndex(nextStepIndex);
+      } else {
+        setStepIndex(nextStepIndex);
       }
     }
   }, [navigate, toast]);
@@ -104,6 +134,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const startOnboarding = useCallback(() => {
     if (!run) {
       setStepIndex(0);
+      setIsCompleted(false);
       setRun(true);
     }
   }, [run]);
@@ -114,9 +145,8 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     stepIndex,
     startOnboarding,
     handleJoyrideCallback,
-    proceedToNextStep,
-    showVideoDialog,
-    setShowVideoDialog,
+    goToStep,
+    isCompleted,
   };
 
   return React.createElement(OnboardingContext.Provider, { value }, children);

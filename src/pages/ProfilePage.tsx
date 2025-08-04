@@ -13,7 +13,7 @@ import { useOnboarding } from '@/hooks/useOnboarding';
 
 const ProfilePage = () => {
   const { loading, profile, accounts, addBankAccount, deleteBankAccount, getUserEmail } = useProfile();
-  const { proceedToNextStep } = useOnboarding();
+  const { goToStep } = useOnboarding();
   const [userEmail, setUserEmail] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState<UserBankAccountFormData>({
@@ -40,7 +40,8 @@ const ProfilePage = () => {
         account_number: '',
         account_holder_name: '',
       });
-      proceedToNextStep();
+      // Le decimos al tour que vaya al paso 3 (el video)
+      goToStep(3);
     }
   };
 
