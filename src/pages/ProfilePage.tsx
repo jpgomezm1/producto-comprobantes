@@ -116,7 +116,7 @@ const ProfilePage = () => {
               <CardTitle>Mis Cuentas de Recaudo</CardTitle>
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button>
+                  <Button data-tour-id="add-account-button">
                     <Plus className="h-4 w-4 mr-2" />
                     Añadir Nueva Cuenta
                   </Button>

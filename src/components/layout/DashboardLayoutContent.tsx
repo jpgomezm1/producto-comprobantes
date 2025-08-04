@@ -4,12 +4,13 @@ import { DashboardHeader } from "./DashboardHeader";
 import { AnimatedSidebar, SidebarBody, SidebarLink } from "@/components/ui/motion-sidebar";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Home, FileText, User, LogOut, Building, BarChart3 } from "lucide-react";
+import { Loader2, Home, FileText, User, LogOut, Building } from "lucide-react";
 import { motion } from "framer-motion";
 import { useComprobantesUsage } from "@/hooks/useComprobantesUsage";
-import { Progress } from "@/components/ui/progress";
-import { OnboardingGuide } from "@/components/onboarding/OnboardingGuide";
-import { useOnboarding } from "@/hooks/useOnboarding";
+import { UsageMeter } from "@/components/onboarding/UsageMeter";
+import { JoyRideTour } from "@/components/onboarding/JoyRideTour";
+import { VideoTutorialDialog } from "@/components/onboarding/VideoTutorialDialog";
+import { useOnboarding } from "@/hooks/useJoyRideOnboarding";
 
 interface UserProfile {
   full_name: string;
@@ -133,6 +134,7 @@ export const DashboardLayoutContent = ({ children }: DashboardLayoutContentProps
                       transition-all duration-200 text-purple-200 hover:bg-purple-700/50 hover:text-white
                       ${location.pathname === link.href ? 'bg-purple-600 text-white hover:bg-purple-600 shadow-lg border border-purple-400/30' : ''}
                     `}
+                    data-tour-id={link.href === '/profile' ? 'profile-link' : undefined}
                   />
                 ))}
               </div>
@@ -164,35 +166,14 @@ export const DashboardLayoutContent = ({ children }: DashboardLayoutContentProps
               )}
 
               {/* Indicador de uso de comprobantes */}
-              {profile && sidebarOpen && (
-                <div className="mb-6 p-4 bg-gradient-to-r from-purple-700/30 to-purple-600/30 rounded-xl border border-purple-600/20">
-                  <div className="flex items-center gap-2 mb-3">
-                    <BarChart3 className="h-4 w-4 text-purple-300" />
-                    <span className="text-sm font-medium text-purple-100">Uso mensual</span>
-                  </div>
-                  
-                  {usageLoading ? (
-                    <div className="text-xs text-purple-300">Cargando...</div>
-                  ) : (
-                    <div className="space-y-2">
-                      <div className="text-xs text-purple-200">
-                        {isUnlimited ? (
-                          `${currentUsage} comprobantes (Ilimitado)`
-                        ) : (
-                          `${currentUsage} / ${limit} comprobantes`
-                        )}
-                      </div>
-                      {!isUnlimited && (
-                        <Progress 
-                          value={usagePercentage} 
-                          className="h-2 bg-purple-800"
-                        />
-                      )}
-                      <div className="text-xs text-purple-400 capitalize">
-                        Plan {profile.selected_plan}
-                      </div>
-                    </div>
-                  )}
+              {profile && sidebarOpen && !usageLoading && (
+                <div className="mb-6">
+                  <UsageMeter
+                    currentUsage={currentUsage}
+                    limit={limit}
+                    isUnlimited={isUnlimited}
+                    planName={profile.selected_plan}
+                  />
                 </div>
               )}
               
@@ -248,8 +229,9 @@ export const DashboardLayoutContent = ({ children }: DashboardLayoutContentProps
         </div>
       </div>
       
-      {/* Onboarding Guide */}
-      <OnboardingGuide />
+      {/* JoyRide Tour Components */}
+      <JoyRideTour />
+      <VideoTutorialDialog />
     </>
   );
 };

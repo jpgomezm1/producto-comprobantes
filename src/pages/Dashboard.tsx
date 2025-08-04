@@ -189,7 +189,9 @@ const Dashboard = () => {
         </div>
 
         {/* Stats Cards (ahora usan los stats filtrados) */}
-        <StatsCards stats={filteredStats} loading={loading} />
+        <div data-tour-id="dashboard-stats">
+          <StatsCards stats={filteredStats} loading={loading} />
+        </div>
 
         {/* Comprobantes Table */}
         <Card className="shadow-lg border-0 bg-white">
