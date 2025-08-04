@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { Step, CallBackProps, STATUS } from 'react-joyride';
+import { Step, CallBackProps, STATUS, EVENTS, ACTIONS } from 'react-joyride';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -43,9 +43,10 @@ export const useOnboardingProvider = () => {
       placement: 'bottom',
     },
     {
-      target: 'body',
-      content: '¡Fantástico! El último paso es ver un video rápido que te enseña a cargar comprobantes usando Telegram. Es la forma más fácil.',
-      placement: 'center',
+        target: 'body',
+        content: '¡Fantástico! Has configurado tu primera cuenta. Ahora puedes volver al dashboard para ver tus estadísticas.',
+        placement: 'center',
+        disableBeacon: true,
     },
     {
       target: '[data-tour-id="dashboard-stats"]',
@@ -55,22 +56,11 @@ export const useOnboardingProvider = () => {
   ];
 
   const handleJoyrideCallback = useCallback(async (data: CallBackProps) => {
-    const { status, type, step, index } = data;
+    const { action, index, status, type, step } = data;
 
-    if (type === 'step:after') {
-      if (step.target === '[data-tour-id="profile-link"]') {
-        navigate('/profile');
-        setStepIndex(index + 1);
-      } else if (step.target === '[data-tour-id="add-account-button"]') {
-        // Pausamos aquí hasta que el usuario añada la cuenta y el video se muestre
-        setRun(false);
-      } else {
-        setStepIndex(index + 1);
-      }
-    }
-    
-    if (status === STATUS.FINISHED || status === STATUS.SKIPPED) {
+    if (([STATUS.FINISHED, STATUS.SKIPPED] as string[]).includes(status)) {
       setRun(false);
+      setStepIndex(0);
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
@@ -86,25 +76,37 @@ export const useOnboardingProvider = () => {
       } catch (error) {
         console.error('Error completing onboarding:', error);
       }
+      return;
+    }
+
+    if (([EVENTS.STEP_AFTER, EVENTS.TARGET_NOT_FOUND] as string[]).includes(type)) {
+      const nextStepIndex = index + (action === ACTIONS.PREV ? -1 : 1);
+
+      if (action === ACTIONS.NEXT) {
+        if (step.target === '[data-tour-id="profile-link"]') {
+          navigate('/profile');
+        } else if (index === 3) { // Después del paso del video/mensaje
+          navigate('/dashboard');
+        }
+      }
+      
+      setStepIndex(nextStepIndex);
     }
   }, [navigate, toast]);
 
   const startOnboarding = useCallback(() => {
-    navigate('/dashboard');
-    setTimeout(() => {
+    if (!run) {
       setStepIndex(0);
       setRun(true);
-    }, 500);
-  }, [navigate]);
+    }
+  }, [run]);
 
   return { run, stepIndex, tourSteps, handleJoyrideCallback, startOnboarding };
 };
 
 export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const value = {
-        // Esta es una versión simplificada del provider, 
-        // el hook `useOnboardingProvider` se usará directamente en el layout.
-        startOnboarding: () => {} 
+        startOnboarding: () => {}
     };
     return React.createElement(OnboardingContext.Provider, { value }, children);
-};
+}

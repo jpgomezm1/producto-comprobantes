@@ -30,14 +30,14 @@ export const DashboardLayoutContent = ({ children }: DashboardLayoutContentProps
   const navigate = useNavigate();
   const location = useLocation();
   const { currentUsage, limit, isUnlimited, loading: usageLoading } = useComprobantesUsage(profile?.selected_plan || 'basico');
+  const [onboardingStatusChecked, setOnboardingStatusChecked] = useState(false);
   
-  // Usamos el nuevo sistema de onboarding
-  const { run, tourSteps, stepIndex, handleJoyrideCallback, startOnboarding } = useOnboardingProvider();
+  const { run, stepIndex, tourSteps, handleJoyrideCallback, startOnboarding } = useOnboardingProvider();
 
-  // Cargar perfil del usuario
   useEffect(() => {
     const fetchProfile = async () => {
-      if (user) {
+      if (user && !onboardingStatusChecked) {
+        setOnboardingStatusChecked(true);
         const { data, error } = await supabase
           .from('profiles')
           .select('full_name, business_name, user_id_card, selected_plan, onboarding_completed')
@@ -46,17 +46,14 @@ export const DashboardLayoutContent = ({ children }: DashboardLayoutContentProps
 
         if (data && !error) {
           setProfile(data);
-          
-          // Iniciar onboarding si no está completado
           if (!data.onboarding_completed) {
             startOnboarding();
           }
         }
       }
     };
-
     fetchProfile();
-  }, [user, startOnboarding]);
+  }, [user, onboardingStatusChecked, startOnboarding]);
 
   // Proteger rutas - redirigir si no está autenticado
   useEffect(() => {
