@@ -10,7 +10,8 @@ import { useComprobantesUsage } from "@/hooks/useComprobantesUsage";
 import { UsageMeter } from "@/components/onboarding/UsageMeter";
 import { JoyRideTour } from "@/components/onboarding/JoyRideTour";
 import { VideoTutorialDialog } from "@/components/onboarding/VideoTutorialDialog";
-import { useOnboarding } from "@/hooks/useJoyRideOnboarding";
+import { useAppOnboarding } from "@/hooks/useAppOnboarding";
+import { AppOnboarding } from "@/components/onboarding/AppOnboarding";
 
 interface UserProfile {
   full_name: string;
@@ -31,7 +32,7 @@ export const DashboardLayoutContent = ({ children }: DashboardLayoutContentProps
   const navigate = useNavigate();
   const location = useLocation();
   const { currentUsage, limit, isUnlimited, usagePercentage, loading: usageLoading } = useComprobantesUsage(profile?.selected_plan || 'basico');
-  const { startTour } = useOnboarding();
+  const { startOnboarding } = useAppOnboarding();
 
   // Cargar perfil del usuario
   useEffect(() => {
@@ -48,14 +49,14 @@ export const DashboardLayoutContent = ({ children }: DashboardLayoutContentProps
           
           // Iniciar onboarding si no está completado
           if (!data.onboarding_completed) {
-            startTour();
+            startOnboarding();
           }
         }
       }
     };
 
     fetchProfile();
-  }, [user, startTour]);
+  }, [user, startOnboarding]);
 
   // Proteger rutas - redirigir si no está autenticado
   useEffect(() => {
@@ -229,9 +230,8 @@ export const DashboardLayoutContent = ({ children }: DashboardLayoutContentProps
         </div>
       </div>
       
-      {/* JoyRide Tour Components */}
-      <JoyRideTour />
-      <VideoTutorialDialog />
+      {/* App Onboarding */}
+      <AppOnboarding />
     </>
   );
 };
