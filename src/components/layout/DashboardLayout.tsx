@@ -72,6 +72,11 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       label: "Dashboard",
       href: "/dashboard",
       icon: <Home className="h-5 w-5" />,
+    },
+    {
+      label: "Mi Perfil",
+      href: "/profile",
+      icon: <User className="h-5 w-5" />,
     }
   ];
 
