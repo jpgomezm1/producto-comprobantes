@@ -68,7 +68,7 @@ export const useAuth = () => {
   const signUp = async (email: string, password: string, fullName: string, userIdCard: string, businessName: string, plan: string = 'basico') => {
     try {
       setLoading(true);
-      const redirectUrl = `${window.location.origin}/`;
+      const redirectUrl = `${window.location.origin}/login`; // Redirigir a login para que confirmen su email
       
       const { error } = await supabase.auth.signUp({
         email,
@@ -89,18 +89,20 @@ export const useAuth = () => {
       }
 
       toast({
-        title: "¡Registro exitoso!",
-        description: "Revisa tu email para confirmar tu cuenta.",
+        title: "¡Registro casi listo!",
+        description: "Revisa tu email para confirmar tu cuenta y poder iniciar sesión.",
       });
 
       return { error: null };
     } catch (error: any) {
-      const errorMessage = 
-        error.message.includes('already registered')
-          ? 'Este email ya está registrado. Intenta iniciar sesión.'
-          : error.message.includes('User already registered')
-          ? 'Este email ya está registrado. Intenta iniciar sesión.'
-          : 'Error al registrarse. Inténtalo de nuevo.';
+      console.error("SignUp Error:", error); // Añadimos un log para ver el error completo en consola.
+      
+      let errorMessage = 'Error al registrarse. Inténtalo de nuevo.';
+      if (error.message.includes('duplicate key value violates unique constraint "profiles_user_id_card_key"')) {
+        errorMessage = 'La cédula o ID ya está registrada con otra cuenta.';
+      } else if (error.message.includes('User already registered')) {
+        errorMessage = 'Este email ya está registrado. Intenta iniciar sesión.';
+      }
       
       toast({
         title: "Error al registrarse",
