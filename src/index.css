@@ -15,8 +15,8 @@ Paleta de colores profesional - TODOS los colores en HSL
     --primary: 220 26% 14%;
     --primary-foreground: 0 0% 100%;
     
-    /* Secundario: #3B82F6 (azul profesional) */
-    --secondary-blue: 217 91% 60%;
+    /* Secundario: #8A2BE2 (morado profesional) */
+    --secondary-blue: 271 68% 53%;
     --secondary-blue-foreground: 0 0% 100%;
     
     /* Acento: #10B981 (verde esmeralda) */
@@ -54,22 +54,22 @@ Paleta de colores profesional - TODOS los colores en HSL
     --input: 220 13% 91%;
     
     /* === OTROS === */
-    --ring: 217 91% 60%;
+    --ring: 271 68% 53%;
     --radius: 0.75rem;
     
     /* === SIDEBAR === */
     --sidebar-background: 220 26% 14%;
     --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary: 271 68% 53%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 220 20% 18%;
     --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 220 20% 18%;
-    --sidebar-ring: 217 91% 60%;
+    --sidebar-ring: 271 68% 53%;
     
     /* === ESTADOS === */
     --hover: 220 14% 95%;
-    --focus: 217 91% 60%;
+    --focus: 271 68% 53%;
     
     /* === GRADIENTES === */
     --gradient-primary: linear-gradient(135deg, hsl(220 26% 14%), hsl(220 20% 18%));
