@@ -1,24 +1,14 @@
-import { useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useCallback } from 'react';
+import { Step, CallBackProps, STATUS } from 'react-joyride';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-export type OnboardingStep = 
-  | 'welcome-profile'
-  | 'create-bank-account' 
-  | 'video-tutorial'
-  | 'explore-dashboard'
-  | 'complete';
-
-interface OnboardingContextType {
-  isActive: boolean;
-  currentStep: OnboardingStep;
-  startTour: () => void;
-  nextStep: () => void;
-  endTour: () => void;
-  goToStep: (step: OnboardingStep) => void;
+export interface OnboardingContextType {
+  startOnboarding: () => void;
 }
 
-import { OnboardingContext } from '@/components/onboarding/OnboardingProvider';
+const OnboardingContext = createContext<OnboardingContextType | undefined>(undefined);
 
 export const useOnboarding = () => {
   const context = useContext(OnboardingContext);
@@ -29,71 +19,92 @@ export const useOnboarding = () => {
 };
 
 export const useOnboardingProvider = () => {
-  const [isActive, setIsActive] = useState(false);
-  const [currentStep, setCurrentStep] = useState<OnboardingStep>('welcome-profile');
+  const [run, setRun] = useState(false);
+  const [stepIndex, setStepIndex] = useState(0);
+  const navigate = useNavigate();
   const { toast } = useToast();
 
-  const stepOrder: OnboardingStep[] = [
-    'welcome-profile',
-    'create-bank-account',
-    'video-tutorial', 
-    'explore-dashboard',
-    'complete'
+  const tourSteps: Step[] = [
+    {
+      target: 'body',
+      content: '¡Bienvenido a Ya Quedo! Vamos a configurar tu cuenta en menos de 2 minutos.',
+      placement: 'center',
+      disableBeacon: true,
+    },
+    {
+      target: '[data-tour-id="profile-link"]',
+      content: 'Para empezar, vamos a tu perfil para que añadas una cuenta bancaria de recaudo.',
+      spotlightClicks: true,
+    },
+    {
+      target: '[data-tour-id="add-account-button"]',
+      content: '¡Excelente! Ahora, haz clic aquí para registrar tu primera cuenta bancaria. Esto nos ayudará a validar tus comprobantes.',
+      spotlightClicks: true,
+      placement: 'bottom',
+    },
+    {
+      target: 'body',
+      content: '¡Fantástico! El último paso es ver un video rápido que te enseña a cargar comprobantes usando Telegram. Es la forma más fácil.',
+      placement: 'center',
+    },
+    {
+      target: '[data-tour-id="dashboard-stats"]',
+      content: '¡Todo listo! Este es tu Dashboard. A medida que cargues comprobantes, aquí verás tus estadísticas en tiempo real.',
+      placement: 'bottom',
+    },
   ];
 
-  const startTour = () => {
-    setIsActive(true);
-    setCurrentStep('welcome-profile');
-  };
+  const handleJoyrideCallback = useCallback(async (data: CallBackProps) => {
+    const { status, type, step, index } = data;
 
-  const nextStep = () => {
-    const currentIndex = stepOrder.indexOf(currentStep);
-    if (currentIndex < stepOrder.length - 1) {
-      setCurrentStep(stepOrder[currentIndex + 1]);
-    } else {
-      endTour();
-    }
-  };
-
-  const goToStep = (step: OnboardingStep) => {
-    setCurrentStep(step);
-  };
-
-  const endTour = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { error } = await supabase
-          .from('profiles')
-          .update({ onboarding_completed: true })
-          .eq('user_id', user.id);
-
-        if (error) throw error;
-
-        toast({
-          title: "¡Onboarding Completado!",
-          description: "Ya estás listo para usar Ya Quedo al máximo",
-        });
+    if (type === 'step:after') {
+      if (step.target === '[data-tour-id="profile-link"]') {
+        navigate('/profile');
+        setStepIndex(index + 1);
+      } else if (step.target === '[data-tour-id="add-account-button"]') {
+        // Pausamos aquí hasta que el usuario añada la cuenta y el video se muestre
+        setRun(false);
+      } else {
+        setStepIndex(index + 1);
       }
-    } catch (error) {
-      console.error('Error completing onboarding:', error);
-      toast({
-        title: "Error",
-        description: "No se pudo completar el onboarding",
-        variant: "destructive",
-      });
     }
+    
+    if (status === STATUS.FINISHED || status === STATUS.SKIPPED) {
+      setRun(false);
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          await supabase
+            .from('profiles')
+            .update({ onboarding_completed: true })
+            .eq('user_id', user.id);
+          toast({
+            title: "¡Onboarding Completado!",
+            description: "Ya estás listo para usar Ya Quedo al máximo.",
+          });
+        }
+      } catch (error) {
+        console.error('Error completing onboarding:', error);
+      }
+    }
+  }, [navigate, toast]);
 
-    setIsActive(false);
-    setCurrentStep('complete');
-  };
+  const startOnboarding = useCallback(() => {
+    navigate('/dashboard');
+    setTimeout(() => {
+      setStepIndex(0);
+      setRun(true);
+    }, 500);
+  }, [navigate]);
 
-  return {
-    isActive,
-    currentStep,
-    startTour,
-    nextStep,
-    endTour,
-    goToStep,
-  };
+  return { run, stepIndex, tourSteps, handleJoyrideCallback, startOnboarding };
+};
+
+export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const value = {
+        // Esta es una versión simplificada del provider, 
+        // el hook `useOnboardingProvider` se usará directamente en el layout.
+        startOnboarding: () => {} 
+    };
+    return React.createElement(OnboardingContext.Provider, { value }, children);
 };

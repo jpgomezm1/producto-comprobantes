@@ -8,10 +8,8 @@ import { Loader2, Home, FileText, User, LogOut, Building } from "lucide-react";
 import { motion } from "framer-motion";
 import { useComprobantesUsage } from "@/hooks/useComprobantesUsage";
 import { UsageMeter } from "@/components/onboarding/UsageMeter";
-import { JoyRideTour } from "@/components/onboarding/JoyRideTour";
-import { VideoTutorialDialog } from "@/components/onboarding/VideoTutorialDialog";
-import { useAppOnboarding } from "@/hooks/useAppOnboarding";
-import { AppOnboarding } from "@/components/onboarding/AppOnboarding";
+import { useOnboardingProvider } from "@/hooks/useOnboarding";
+import { OnboardingTour } from "@/components/onboarding/OnboardingTour";
 
 interface UserProfile {
   full_name: string;
@@ -31,8 +29,10 @@ export const DashboardLayoutContent = ({ children }: DashboardLayoutContentProps
   const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const { currentUsage, limit, isUnlimited, usagePercentage, loading: usageLoading } = useComprobantesUsage(profile?.selected_plan || 'basico');
-  const { startOnboarding } = useAppOnboarding();
+  const { currentUsage, limit, isUnlimited, loading: usageLoading } = useComprobantesUsage(profile?.selected_plan || 'basico');
+  
+  // Usamos el nuevo sistema de onboarding
+  const { run, tourSteps, stepIndex, handleJoyrideCallback, startOnboarding } = useOnboardingProvider();
 
   // Cargar perfil del usuario
   useEffect(() => {
@@ -102,6 +102,12 @@ export const DashboardLayoutContent = ({ children }: DashboardLayoutContentProps
 
   return (
     <>
+      <OnboardingTour 
+        run={run}
+        steps={tourSteps}
+        stepIndex={stepIndex}
+        handleJoyrideCallback={handleJoyrideCallback}
+      />
       <div className="flex h-screen w-full bg-background">
         <AnimatedSidebar open={sidebarOpen} setOpen={setSidebarOpen}>
           <SidebarBody className="justify-between gap-10 h-full">
@@ -229,9 +235,6 @@ export const DashboardLayoutContent = ({ children }: DashboardLayoutContentProps
           </main>
         </div>
       </div>
-      
-      {/* App Onboarding */}
-      <AppOnboarding />
     </>
   );
 };

@@ -1,4 +1,3 @@
-import { OnboardingProvider } from "@/components/onboarding/OnboardingProvider";
 import { DashboardLayoutContent } from "./DashboardLayoutContent";
 
 interface DashboardLayoutProps {
@@ -7,8 +6,6 @@ interface DashboardLayoutProps {
 
 export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   return (
-    <OnboardingProvider>
-      <DashboardLayoutContent>{children}</DashboardLayoutContent>
-    </OnboardingProvider>
+    <DashboardLayoutContent>{children}</DashboardLayoutContent>
   );
 };
