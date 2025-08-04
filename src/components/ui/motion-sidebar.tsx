@@ -90,12 +90,11 @@ export const DesktopSidebar = ({
   return (
     <motion.div
       className={cn(
-        "h-screen px-4 py-4 hidden md:flex md:flex-col w-[300px] flex-shrink-0",
+        "h-screen px-2 py-4 hidden md:flex md:flex-col w-[300px] flex-shrink-0 bg-gray-800",
         className
       )}
-      style={{ backgroundColor: "hsl(var(--sidebar))" }}
       animate={{
-        width: animate ? (open ? "300px" : "80px") : "300px",
+        width: animate ? (open ? "300px" : "70px") : "300px",
       }}
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
@@ -117,14 +116,13 @@ export const MobileSidebar = ({
     <>
       <div
         className={cn(
-          "h-16 px-4 py-4 flex flex-row md:hidden items-center justify-between w-full"
+          "h-16 px-4 py-4 flex flex-row md:hidden items-center justify-between w-full bg-gray-800"
         )}
-        style={{ backgroundColor: "hsl(var(--sidebar))" }}
       >
         <div className="flex justify-between items-center w-full">
-          <h1 className="text-sidebar-foreground font-semibold">Sistema de Comprobantes</h1>
+          <h1 className="text-white font-semibold">Sistema de Comprobantes</h1>
           <Menu
-            className="text-sidebar-foreground cursor-pointer"
+            className="text-white cursor-pointer"
             onClick={() => setOpen(!open)}
           />
         </div>
@@ -139,13 +137,12 @@ export const MobileSidebar = ({
                 ease: "easeInOut",
               }}
               className={cn(
-                "fixed h-full w-full inset-0 p-10 z-[100] flex flex-col justify-between",
+                "fixed h-full w-full inset-0 p-10 z-[100] flex flex-col justify-between bg-gray-800",
                 className
               )}
-              style={{ backgroundColor: "hsl(var(--sidebar))" }}
             >
               <div
-                className="absolute right-6 top-6 z-50 text-sidebar-foreground cursor-pointer"
+                className="absolute right-6 top-6 z-50 text-white cursor-pointer"
                 onClick={() => setOpen(!open)}
               >
                 <X />
@@ -174,15 +171,21 @@ export const SidebarLink = ({
     <Link
       to={link.href}
       className={cn(
-        "flex items-center justify-start gap-3 group/sidebar py-3 px-2 rounded-lg transition-colors duration-200",
+        "flex items-center rounded-lg transition-all duration-200 outline-none focus:outline-none focus:ring-0",
+        open 
+          ? "justify-start gap-3 py-3 px-3" 
+          : "justify-center py-3 px-2",
         isActive 
-          ? "bg-sidebar-primary text-sidebar-primary-foreground" 
-          : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground text-sidebar-foreground",
+          ? "bg-blue-600 text-white hover:bg-blue-700" 
+          : "text-gray-300 hover:bg-gray-700 hover:text-white",
         className
       )}
       {...props}
     >
-      <div className="h-6 w-6 flex-shrink-0">
+      <div className={cn(
+        "flex-shrink-0",
+        open ? "h-5 w-5" : "h-6 w-6"
+      )}>
         {link.icon}
       </div>
       <motion.span
@@ -190,7 +193,7 @@ export const SidebarLink = ({
           display: animate ? (open ? "inline-block" : "none") : "inline-block",
           opacity: animate ? (open ? 1 : 0) : 1,
         }}
-        className="text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
+        className="text-sm font-medium transition duration-150 whitespace-pre inline-block !p-0 !m-0"
       >
         {link.label}
       </motion.span>

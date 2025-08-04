@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { DashboardHeader } from "./DashboardHeader";
 import { AnimatedSidebar, SidebarBody, SidebarLink } from "@/components/ui/motion-sidebar";
 import { useAuth } from "@/hooks/useAuth";
-import { Loader2, Home, FileText, Plus, BarChart3, User, LogOut } from "lucide-react";
+import { Loader2, Home, FileText, User, LogOut } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface DashboardLayoutProps {
@@ -45,22 +45,7 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       label: "Dashboard",
       href: "/dashboard",
       icon: <Home className="h-5 w-5" />,
-    },
-    {
-      label: "Comprobantes",
-      href: "/comprobantes",
-      icon: <FileText className="h-5 w-5" />,
-    },
-    {
-      label: "Nuevo Comprobante",
-      href: "/comprobantes/nuevo",
-      icon: <Plus className="h-5 w-5" />,
-    },
-    {
-      label: "Reportes",
-      href: "/reportes",
-      icon: <BarChart3 className="h-5 w-5" />,
-    },
+    }
   ];
 
   const handleLogout = async () => {
@@ -71,50 +56,60 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   return (
     <div className="flex h-screen w-full bg-background">
       <AnimatedSidebar open={sidebarOpen} setOpen={setSidebarOpen}>
-        <SidebarBody className="justify-between gap-10">
+        <SidebarBody className="justify-between gap-10 h-full">
           <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
             {/* Logo */}
-            <div className="flex items-center gap-2 py-4">
-              <div className="h-8 w-8 bg-secondary-blue rounded-lg flex-shrink-0 flex items-center justify-center">
-                <FileText className="h-5 w-5 text-white" />
+            <div className="flex items-center gap-3 py-6 px-2">
+              <div className="h-10 w-10 bg-blue-600 rounded-lg flex-shrink-0 flex items-center justify-center shadow-lg">
+                <FileText className="h-6 w-6 text-white" />
               </div>
-              <motion.span
+              <motion.div
                 animate={{
-                  display: sidebarOpen ? "inline-block" : "none",
+                  display: sidebarOpen ? "block" : "none",
                   opacity: sidebarOpen ? 1 : 0,
                 }}
-                className="font-semibold text-sidebar-foreground text-lg whitespace-pre"
+                className="whitespace-pre"
               >
-                Sistema de Comprobantes
-              </motion.span>
+                <h1 className="font-bold text-white text-lg leading-tight">Sistema de</h1>
+                <p className="text-gray-300 text-sm">Comprobantes</p>
+              </motion.div>
             </div>
             
             {/* Navigation Links */}
-            <div className="mt-8 flex flex-col gap-2">
+            <div className="mt-4 flex flex-col gap-2 px-2">
               {navigationItems.map((link, idx) => (
                 <SidebarLink 
                   key={idx} 
                   link={link} 
                   isActive={location.pathname === link.href}
+                  className={`
+                    flex items-center justify-start gap-3 py-3 px-3 rounded-lg 
+                    transition-all duration-200 text-gray-300 hover:bg-gray-700 hover:text-white
+                    ${location.pathname === link.href ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg' : ''}
+                  `}
                 />
               ))}
             </div>
           </div>
           
           {/* User Section */}
-          <div className="border-t border-sidebar-border pt-4">
-            <SidebarLink
-              link={{
-                label: user.email || "Usuario",
-                href: "/profile",
-                icon: <User className="h-5 w-5" />,
-              }}
-            />
+          <div className="border-t border-gray-600 pt-4 px-2">
+            <div className="mb-3">
+              <SidebarLink
+                link={{
+                  label: user.email || "Usuario",
+                  href: "/profile",
+                  icon: <User className="h-5 w-5" />,
+                }}
+                className="flex items-center justify-start gap-3 py-3 px-3 rounded-lg transition-all duration-200 text-gray-300 hover:bg-gray-700 hover:text-white"
+              />
+            </div>
+            
             <div 
               onClick={handleLogout}
-              className="flex items-center justify-start gap-3 group/sidebar py-3 px-2 rounded-lg hover:bg-sidebar-accent hover:text-sidebar-accent-foreground text-sidebar-foreground transition-colors duration-200 cursor-pointer"
+              className="flex items-center justify-start gap-3 py-3 px-3 rounded-lg hover:bg-red-600 hover:text-white text-gray-300 transition-all duration-200 cursor-pointer group"
             >
-              <div className="h-6 w-6 flex-shrink-0">
+              <div className="h-5 w-5 flex-shrink-0">
                 <LogOut className="h-5 w-5" />
               </div>
               <motion.span
@@ -122,18 +117,32 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                   display: sidebarOpen ? "inline-block" : "none",
                   opacity: sidebarOpen ? 1 : 0,
                 }}
-                className="text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
+                className="text-sm font-medium group-hover:translate-x-1 transition-transform duration-150 whitespace-pre inline-block !p-0 !m-0"
               >
                 Cerrar Sesión
               </motion.span>
             </div>
+            
+            {/* Footer info */}
+            <motion.div
+              animate={{
+                display: sidebarOpen ? "block" : "none",
+                opacity: sidebarOpen ? 1 : 0,
+              }}
+              className="mt-4 pt-3 border-t border-gray-600"
+            >
+              <div className="text-xs text-gray-400 text-center space-y-1">
+                <p className="font-medium">© 2025</p>
+                <p className="text-gray-500">v1.0.0</p>
+              </div>
+            </motion.div>
           </div>
         </SidebarBody>
       </AnimatedSidebar>
       
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <main className="flex-1 overflow-auto p-6">
+        <main className="flex-1 overflow-auto p-6 bg-gray-50">
           {children}
         </main>
       </div>

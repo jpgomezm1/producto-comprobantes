@@ -22,12 +22,7 @@ const Dashboard = () => {
               Resumen de tus comprobantes bancarios
             </p>
           </div>
-          <Button variant="blue" asChild>
-            <Link to="/comprobantes/nuevo">
-              <Plus className="mr-2 h-4 w-4" />
-              Nuevo Comprobante
-            </Link>
-          </Button>
+
         </div>
 
         {/* Stats Cards */}
@@ -79,10 +74,8 @@ const Dashboard = () => {
               <div className="text-center py-8">
                 <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <h3 className="font-medium text-foreground mb-2">No hay comprobantes</h3>
-                <p className="text-muted-foreground mb-4">Crea tu primer comprobante para comenzar</p>
-                <Button variant="blue" asChild>
-                  <Link to="/comprobantes/nuevo">Crear Comprobante</Link>
-                </Button>
+                <p className="text-muted-foreground mb-4">Carga tu primer comprobante para comenzar</p>
+
               </div>
             )}
           </CardContent>
