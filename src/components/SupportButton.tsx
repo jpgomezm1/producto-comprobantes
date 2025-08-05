@@ -27,7 +27,7 @@ export const SupportButton = () => {
   };
 
   const handleEmail = () => {
-    const email = 'soporte@yaquedo.com'; // Cambia por tu email real
+    const email = 'tech@stayirrelevant.com'; // Cambia por tu email real
     const subject = encodeURIComponent('Soporte Ya Quedo - Solicitud de Ayuda');
     const body = encodeURIComponent(`¡Hola equipo de Ya Quedo! 👋
 
