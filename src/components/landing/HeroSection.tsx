@@ -22,7 +22,7 @@ export const HeroSection = () => {
         <div className="inline-flex items-center gap-3 bg-gradient-to-r from-purple-500/10 to-indigo-500/10 border border-purple-200 rounded-full px-4 py-2 text-sm font-medium mb-6 backdrop-blur-sm">
   <span className="text-purple-700">Developed by</span>
   <img 
-    src="https://storage.googleapis.com/cluvi/nuevo_irre-removebg-preview.png" 
+    src="https://storage.googleapis.com/cluvi/Web-Risk/logo_final_morado_irrelevant.PNG" 
     alt="Irrelevant Logo" 
     className="h-5 w-auto"
   />
