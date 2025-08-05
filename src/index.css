@@ -107,3 +107,153 @@ Paleta de colores profesional - TODOS los colores en HSL
     @apply bg-background text-foreground;
   }
 }
+
+/* Mejoras adicionales para Joyride */
+.__floater .react-joyride__tooltip {
+  transform: none !important;
+}
+
+.__floater [data-action="primary"]:hover {
+  background-color: hsl(271, 68%, 48%) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 20px hsl(271, 68%, 53%, 0.4) !important;
+}
+
+.__floater [data-action="back"]:hover {
+  background-color: hsl(220, 14%, 96%) !important;
+  border-color: hsl(271, 68%, 53%) !important;
+  color: hsl(271, 68%, 53%) !important;
+}
+
+.__floater [data-action="close"]:hover {
+  background-color: hsl(0, 84%, 60%) !important;
+  color: white !important;
+}
+
+.__floater [data-action="skip"]:hover {
+  color: hsl(271, 68%, 53%) !important;
+}
+
+/* ========================================
+   MEJORAS PARA JOYRIDE SPOTLIGHT - VERSIÓN FINAL
+   ======================================== */
+
+/* Animación para el spotlight con borde visible */
+@keyframes spotlightPulse {
+  0%, 100% {
+    border-color: hsl(271, 68%, 53%);
+    box-shadow: 
+      0 0 0 4px rgba(139, 43, 226, 0.3),
+      0 0 20px hsl(271, 68%, 53%, 0.5);
+    transform: scale(1);
+  }
+  50% {
+    border-color: hsl(271, 68%, 60%);
+    box-shadow: 
+      0 0 0 6px rgba(139, 43, 226, 0.5),
+      0 0 30px hsl(271, 68%, 53%, 0.7);
+    transform: scale(1.002);
+  }
+}
+
+/* Spotlight completamente transparente pero con borde visible */
+.react-joyride__spotlight,
+.__floater__spotlight {
+  background: transparent !important; /* Completamente transparente */
+  border: 4px solid hsl(271, 68%, 53%) !important; /* Borde morado visible */
+  border-radius: 12px !important;
+  box-shadow: 
+    0 0 0 4px rgba(139, 43, 226, 0.3),
+    0 0 20px hsl(271, 68%, 53%, 0.5) !important;
+  animation: spotlightPulse 2s ease-in-out infinite !important;
+  z-index: 10001 !important;
+}
+
+/* Asegurar que el contenido sea completamente interactivo */
+.react-joyride__spotlight *,
+.__floater__spotlight * {
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: inherit !important;
+}
+
+/* El overlay mantiene su opacidad normal */
+.react-joyride__overlay,
+.__floater__overlay {
+  background: rgba(31, 41, 55, 0.4) !important;
+  backdrop-filter: blur(1px) !important;
+}
+
+/* Mejoras adicionales para Joyride */
+.__floater .react-joyride__tooltip {
+  transform: none !important;
+}
+
+.__floater [data-action="primary"]:hover {
+  background-color: hsl(271, 68%, 48%) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 20px hsl(271, 68%, 53%, 0.4) !important;
+}
+
+.__floater [data-action="back"]:hover {
+  background-color: hsl(220, 14%, 96%) !important;
+  border-color: hsl(271, 68%, 53%) !important;
+  color: hsl(271, 68%, 53%) !important;
+}
+
+.__floater [data-action="close"]:hover {
+  background-color: hsl(0, 84%, 95%) !important;
+  color: hsl(0, 84%, 60%) !important;
+  border-radius: 4px !important;
+}
+
+.__floater [data-action="skip"]:hover {
+  color: hsl(271, 68%, 53%) !important;
+}
+
+/* Mejora el botón de cerrar */
+.__floater [data-action="close"] {
+  width: 24px !important;
+  height: 24px !important;
+  font-size: 14px !important;
+  line-height: 1 !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Asegura que el contenido del tooltip sea legible */
+.__floater .react-joyride__tooltip {
+  background: #ffffff !important;
+  color: hsl(220, 26%, 14%) !important;
+}
+
+/* Mejora el progreso del tour */
+.__floater [data-test-id="progress"] {
+  background: linear-gradient(90deg, hsl(271, 68%, 53%), hsl(271, 68%, 45%)) !important;
+  border-radius: 4px !important;
+  height: 4px !important;
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+  .__floater .react-floater__body {
+    max-width: calc(100vw - 32px) !important;
+    margin: 0 16px !important;
+  }
+  
+  .__floater .react-floater__content {
+    padding: 20px !important;
+    font-size: 14px !important;
+  }
+  
+  /* Ajuste del spotlight en móviles */
+  .__floater__spotlight {
+    box-shadow: 
+      0 0 0 3px hsl(271, 68%, 53%),
+      0 0 0 6px rgba(139, 43, 226, 0.3),
+      0 0 0 9999px rgba(31, 41, 55, 0.4),
+      0 0 15px hsl(271, 68%, 53%, 0.4) !important;
+  }
+}
