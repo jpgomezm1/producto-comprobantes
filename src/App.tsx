@@ -1,10 +1,10 @@
-// src/App.tsx
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { OnboardingProvider } from "@/hooks/useOnboarding";
+import { SupportButton } from "@/components/SupportButton";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -29,6 +29,9 @@ const App = () => (
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          
+          {/* Botón de soporte flotante en todas las páginas */}
+          <SupportButton />
         </OnboardingProvider>
       </BrowserRouter>
     </TooltipProvider>
