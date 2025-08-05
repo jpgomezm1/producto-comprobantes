@@ -4,22 +4,7 @@ import { Step, CallBackProps, STATUS, EVENTS, ACTIONS } from 'react-joyride';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-
-// Define el contenido del video como string HTML
-const getVideoStepContent = () => `
-  <div style="text-align: center;">
-    <h2 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;">Carga comprobantes en segundos con Telegram</h2>
-    <p style="margin-bottom: 1rem;">La forma más fácil de registrar tus comprobantes es a través de nuestro bot de Telegram.</p>
-    <div style="aspect-ratio: 16/9; width: 100%; background: #f1f5f9; border-radius: 0.5rem; overflow: hidden; margin-bottom: 1rem;">
-      <iframe
-        src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-        title="Tutorial Telegram Ya Quedo"
-        style="width: 100%; height: 100%;"
-        allowfullscreen>
-      </iframe>
-    </div>
-  </div>
-`;
+import { OnboardingVideoStep } from '@/components/onboarding/OnboardingVideoStep';
 
 interface OnboardingContextType {
   run: boolean;
@@ -71,7 +56,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     {
       target: 'body',
       placement: 'center',
-      content: getVideoStepContent(),
+      content: React.createElement(OnboardingVideoStep),
     },
     {
       target: '[data-tour-id="dashboard-stats"]',
