@@ -134,12 +134,6 @@ export const StatsCards = ({ stats, loading }: StatsCardsProps) => {
                   <span className="text-xs font-medium text-gray-600">{card.change}</span>
                 </div>
               )}
-              {card.changeType === "negative" && (
-                <div className="flex items-center gap-1">
-                  <TrendingUp className="h-3 w-3 text-red-500 rotate-180" />
-                  <span className="text-xs font-medium text-red-600">{card.change}</span>
-                </div>
-              )}
             </div>
           </CardContent>
         </Card>

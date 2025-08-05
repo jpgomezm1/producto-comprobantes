@@ -3,6 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 
 export const useComprobantesUsage = (selectedPlan: string) => {
   const [currentUsage, setCurrentUsage] = useState(0);
+  const [validCount, setValidCount] = useState(0);
+  const [invalidCount, setInvalidCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
   const planLimits = {
@@ -21,15 +23,32 @@ export const useComprobantesUsage = (selectedPlan: string) => {
       const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
       const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
-      const { count, error } = await supabase
+      // Contar todos los comprobantes
+      const { count: totalCount, error: totalError } = await supabase
         .from('comprobantes')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', user.id)
         .gte('fecha', firstDay.toISOString().split('T')[0])
         .lte('fecha', lastDay.toISOString().split('T')[0]);
 
-      if (error) throw error;
-      setCurrentUsage(count || 0);
+      // Contar solo los válidos
+      const { count: validCountResult, error: validError } = await supabase
+        .from('comprobantes')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('es_valido', true)
+        .gte('fecha', firstDay.toISOString().split('T')[0])
+        .lte('fecha', lastDay.toISOString().split('T')[0]);
+
+      if (totalError || validError) throw totalError || validError;
+      
+      const total = totalCount || 0;
+      const valid = validCountResult || 0;
+      const invalid = total - valid;
+      
+      setCurrentUsage(total);
+      setValidCount(valid);
+      setInvalidCount(invalid);
     } catch (error) {
       console.error('Error fetching comprobantes usage:', error);
       setCurrentUsage(0);
@@ -48,6 +67,8 @@ export const useComprobantesUsage = (selectedPlan: string) => {
 
   return {
     currentUsage,
+    validCount,
+    invalidCount,
     limit,
     isUnlimited,
     usagePercentage,

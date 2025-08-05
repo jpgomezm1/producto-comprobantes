@@ -36,7 +36,7 @@ export const DashboardLayoutContent = ({ children }: DashboardLayoutContentProps
   const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const { currentUsage, limit, isUnlimited, loading: usageLoading } = useComprobantesUsage(profile?.selected_plan || 'basico');
+  const { currentUsage, validCount, invalidCount, limit, isUnlimited, loading: usageLoading } = useComprobantesUsage(profile?.selected_plan || 'basico');
   const [onboardingStatusChecked, setOnboardingStatusChecked] = useState(false);
   
   const { run, stepIndex, steps, handleJoyrideCallback, startOnboarding, isCompleted } = useOnboarding();
@@ -169,6 +169,8 @@ export const DashboardLayoutContent = ({ children }: DashboardLayoutContentProps
                 <div className="mb-4">
                   <UsageMeter
                     currentUsage={currentUsage}
+                    validCount={validCount}
+                    invalidCount={invalidCount}
                     limit={limit}
                     isUnlimited={isUnlimited}
                     planName={profile.selected_plan}

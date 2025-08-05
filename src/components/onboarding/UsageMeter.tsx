@@ -4,6 +4,8 @@ import { BarChart3 } from 'lucide-react';
 
 interface UsageMeterProps {
   currentUsage: number;
+  validCount: number;
+  invalidCount: number;
   limit: number;
   isUnlimited?: boolean;
   planName: string;
@@ -11,6 +13,8 @@ interface UsageMeterProps {
 
 export const UsageMeter = ({ 
   currentUsage, 
+  validCount,
+  invalidCount,
   limit, 
   isUnlimited = false, 
   planName 
@@ -32,6 +36,13 @@ export const UsageMeter = ({
             `${currentUsage} / ${limit} comprobantes`
           )}
         </div>
+        
+        {currentUsage > 0 && (
+          <div className="text-xs text-purple-300 space-y-1">
+            <div>✓ {validCount} válidos</div>
+            <div>✗ {invalidCount} inválidos</div>
+          </div>
+        )}
         
         {!isUnlimited && (
           <Progress 
