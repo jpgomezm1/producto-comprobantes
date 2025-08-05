@@ -143,21 +143,12 @@ export const RegisterForm = () => {
           <div className="text-center mb-8">
             <div className="flex justify-center mb-4">
               <img 
-                src="https://storage.googleapis.com/cluvi/nuevo_irre-removebg-preview.png" 
+                src="https://storage.googleapis.com/cluvi/Web-Risk/logo_final_morado_irrelevant.PNG" 
                 alt="Irrelevant Logo" 
                 className="h-10 w-auto"
               />
             </div>
             
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-                <Zap className="h-4 w-4 text-white" />
-              </div>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-                Ya Quedo
-              </h1>
-            </div>
-            <p className="text-gray-600 text-sm">Sistema de Validación Automática</p>
           </div>
 
           <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-sm">

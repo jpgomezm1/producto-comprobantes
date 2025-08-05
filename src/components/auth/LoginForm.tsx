@@ -53,22 +53,12 @@ export const LoginForm = () => {
           {/* Logo de Irrelevant prominente */}
           <div className="flex justify-center mb-4">
             <img 
-              src="https://storage.googleapis.com/cluvi/nuevo_irre-removebg-preview.png" 
+              src="https://storage.googleapis.com/cluvi/Web-Risk/logo_final_morado_irrelevant.PNG" 
               alt="Irrelevant Logo" 
               className="h-12 w-auto"
             />
           </div>
           
-          {/* Ya Quedo branding */}
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-              <Zap className="h-5 w-5 text-white" />
-            </div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-              Ya Quedo
-            </h1>
-          </div>
-          <p className="text-gray-600">Sistema de Validación Automática</p>
         </div>
 
         <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-sm">
@@ -184,24 +174,7 @@ export const LoginForm = () => {
                 </Link>
               </div>
             </div>
-
-            {/* Features highlight */}
-            <div className="pt-4 border-t border-gray-100">
-              <div className="grid grid-cols-2 gap-4 text-xs text-center">
-                <div className="flex flex-col items-center gap-1">
-                  <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                    <Shield className="h-4 w-4 text-green-600" />
-                  </div>
-                  <span className="text-gray-600">Validación 24/7</span>
-                </div>
-                <div className="flex flex-col items-center gap-1">
-                  <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <Zap className="h-4 w-4 text-purple-600" />
-                  </div>
-                  <span className="text-gray-600">Sin fraudes</span>
-                </div>
-              </div>
-            </div>
+            
           </CardContent>
         </Card>
 

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { MessageCircle, Mail, X, HelpCircle, Headphones } from 'lucide-react';
+import { MessageCircle, Mail, X, HelpCircle, Headphones, PlayCircle } from 'lucide-react';
+import { useOnboarding } from '@/hooks/useOnboarding';
 
 export const SupportButton = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const { startOnboarding } = useOnboarding();
 
   // Auto-hide en scroll (opcional)
   useEffect(() => {
@@ -27,7 +29,7 @@ export const SupportButton = () => {
   };
 
   const handleEmail = () => {
-    const email = 'tech@stayirrelevant.com'; // Cambia por tu email real
+    const email = 'tech@stayirrelevant.com';
     const subject = encodeURIComponent('Soporte Ya Quedo - Solicitud de Ayuda');
     const body = encodeURIComponent(`¡Hola equipo de Ya Quedo! 👋
 
@@ -42,6 +44,11 @@ Información adicional:
 ¡Gracias por su apoyo!`);
     const url = `mailto:${email}?subject=${subject}&body=${body}`;
     window.location.href = url;
+    setIsOpen(false);
+  };
+
+  const handleTutorial = () => {
+    startOnboarding();
     setIsOpen(false);
   };
 
@@ -70,6 +77,26 @@ Información adicional:
               : 'opacity-0 translate-y-8 scale-90 pointer-events-none'
           }`}
         >
+          {/* Opción Tutorial */}
+          <div className="relative group">
+            <button
+              onClick={handleTutorial}
+              className="flex items-center gap-3 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white px-5 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group"
+            >
+              <PlayCircle size={20} className="animate-bounce" />
+              <span className="font-semibold pr-1">Tutorial</span>
+              
+              {/* Efecto de brillo */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 rounded-full transition-opacity duration-300 group-hover:animate-pulse"></div>
+            </button>
+            
+            {/* Tooltip */}
+            <div className="absolute right-full mr-3 top-1/2 transform -translate-y-1/2 bg-gray-900 text-white text-sm py-2 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap pointer-events-none shadow-lg">
+              Ver tutorial otra vez
+              <div className="absolute left-full top-1/2 transform -translate-y-1/2 border-4 border-transparent border-l-gray-900"></div>
+            </div>
+          </div>
+
           {/* Opción WhatsApp */}
           <div className="relative group">
             <button
