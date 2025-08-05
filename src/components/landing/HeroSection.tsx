@@ -1,8 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Shield, Clock, AlertTriangle, CheckCircle, Zap, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import { VideoTutorialDialog } from "./VideoTutorialDialog";
 
 export const HeroSection = () => {
+  const [isVideoDialogOpen, setIsVideoDialogOpen] = useState(false);
+
   return (
     <section id="inicio" className="relative overflow-hidden bg-white py-24 px-4">
       {/* Background decorative elements with purple theme */}
@@ -78,11 +82,9 @@ export const HeroSection = () => {
             variant="outline" 
             size="lg"
             className="text-lg px-8 py-4 h-auto border-2 border-purple-200 text-purple-700 hover:bg-purple-50 hover:border-purple-300"
-            asChild
+            onClick={() => setIsVideoDialogOpen(true)}
           >
-            <Link to="/demo">
-              Ver cómo funciona
-            </Link>
+            Ver cómo funciona
           </Button>
         </div>
 
@@ -210,6 +212,12 @@ export const HeroSection = () => {
           </div>
         </div>
       </div>
+
+      {/* Video Tutorial Dialog */}
+      <VideoTutorialDialog 
+        isOpen={isVideoDialogOpen} 
+        onClose={() => setIsVideoDialogOpen(false)} 
+      />
     </section>
   );
 };
