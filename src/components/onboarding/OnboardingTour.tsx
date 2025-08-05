@@ -103,7 +103,7 @@ export const OnboardingTour = ({ run, steps, stepIndex, handleJoyrideCallback }:
           height: '40px',
           boxShadow: '0 8px 32px rgba(124, 58, 237, 0.3)',
         },
-        tooltipFooter: {
+        footer: {
           marginTop: '16px',
           paddingTop: '16px',
           borderTop: '1px solid #f3f4f6',
