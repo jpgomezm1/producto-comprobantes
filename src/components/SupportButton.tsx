@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { MessageCircle, Mail, X, HelpCircle, Headphones, PlayCircle } from 'lucide-react';
+import { MessageCircle, Mail, X, HelpCircle, Headphones, PlayCircle, Phone } from 'lucide-react';
 import { useOnboarding } from '@/hooks/useOnboarding';
+import { useLocation } from 'react-router-dom';
 
 export const SupportButton = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const { startOnboarding } = useOnboarding();
+  const location = useLocation();
+  
+  // Detectar si estamos en la Landing Page
+  const isLandingPage = location.pathname === '/';
 
   // Auto-hide en scroll (opcional)
   useEffect(() => {
@@ -21,8 +26,10 @@ export const SupportButton = () => {
   }, [lastScrollY]);
 
   const handleWhatsApp = () => {
-    const phoneNumber = '+573183351733';
-    const message = encodeURIComponent('¡Hola! Necesito ayuda con Ya Quedo. 👋');
+    const phoneNumber = '+573183849532';
+    const message = isLandingPage 
+      ? encodeURIComponent('¡Hola! Estoy interesado en Ya Quedó para mi negocio. 👋')
+      : encodeURIComponent('¡Hola! Necesito ayuda con Ya Quedó. 👋');
     const url = `https://wa.me/${phoneNumber}?text=${message}`;
     window.open(url, '_blank');
     setIsOpen(false);
@@ -30,8 +37,24 @@ export const SupportButton = () => {
 
   const handleEmail = () => {
     const email = 'tech@stayirrelevant.com';
-    const subject = encodeURIComponent('Soporte Ya Quedo - Solicitud de Ayuda');
-    const body = encodeURIComponent(`¡Hola equipo de Ya Quedo! 👋
+    const subject = isLandingPage 
+      ? encodeURIComponent('Consulta sobre Ya Quedó - Nuevo Prospecto')
+      : encodeURIComponent('Soporte Ya Quedó - Solicitud de Ayuda');
+    const body = isLandingPage 
+      ? encodeURIComponent(`¡Hola equipo de Ya Quedó! 👋
+
+Estoy interesado en conocer más sobre su solución de validación de comprobantes.
+
+Mi consulta es sobre:
+[ Describe tu consulta aquí ]
+
+Información de mi negocio:
+- Tipo de negocio: 
+- Volumen de comprobantes mensual: 
+- Bancos que uso: 
+
+¡Gracias!`)
+      : encodeURIComponent(`¡Hola equipo de Ya Quedó! 👋
 
 Necesito ayuda con:
 
@@ -77,25 +100,27 @@ Información adicional:
               : 'opacity-0 translate-y-8 scale-90 pointer-events-none'
           }`}
         >
-          {/* Opción Tutorial */}
-          <div className="relative group">
-            <button
-              onClick={handleTutorial}
-              className="flex items-center gap-3 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white px-5 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group"
-            >
-              <PlayCircle size={20} className="animate-bounce" />
-              <span className="font-semibold pr-1">Tutorial</span>
+          {/* Opción Tutorial - Solo en páginas que no sean Landing */}
+          {!isLandingPage && (
+            <div className="relative group">
+              <button
+                onClick={handleTutorial}
+                className="flex items-center gap-3 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white px-5 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group"
+              >
+                <PlayCircle size={20} className="animate-bounce" />
+                <span className="font-semibold pr-1">Tutorial</span>
+                
+                {/* Efecto de brillo */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 rounded-full transition-opacity duration-300 group-hover:animate-pulse"></div>
+              </button>
               
-              {/* Efecto de brillo */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 rounded-full transition-opacity duration-300 group-hover:animate-pulse"></div>
-            </button>
-            
-            {/* Tooltip */}
-            <div className="absolute right-full mr-3 top-1/2 transform -translate-y-1/2 bg-gray-900 text-white text-sm py-2 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap pointer-events-none shadow-lg">
-              Ver tutorial otra vez
-              <div className="absolute left-full top-1/2 transform -translate-y-1/2 border-4 border-transparent border-l-gray-900"></div>
+              {/* Tooltip */}
+              <div className="absolute right-full mr-3 top-1/2 transform -translate-y-1/2 bg-gray-900 text-white text-sm py-2 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap pointer-events-none shadow-lg">
+                Ver tutorial otra vez
+                <div className="absolute left-full top-1/2 transform -translate-y-1/2 border-4 border-transparent border-l-gray-900"></div>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Opción WhatsApp */}
           <div className="relative group">
@@ -112,7 +137,7 @@ Información adicional:
             
             {/* Tooltip */}
             <div className="absolute right-full mr-3 top-1/2 transform -translate-y-1/2 bg-gray-900 text-white text-sm py-2 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap pointer-events-none shadow-lg">
-              Chat en tiempo real
+              {isLandingPage ? 'Consulta sobre Ya Quedó' : 'Chat en tiempo real'}
               <div className="absolute left-full top-1/2 transform -translate-y-1/2 border-4 border-transparent border-l-gray-900"></div>
             </div>
           </div>
@@ -132,7 +157,7 @@ Información adicional:
             
             {/* Tooltip */}
             <div className="absolute right-full mr-3 top-1/2 transform -translate-y-1/2 bg-gray-900 text-white text-sm py-2 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap pointer-events-none shadow-lg">
-              Soporte por correo
+              {isLandingPage ? 'Información por correo' : 'Soporte por correo'}
               <div className="absolute left-full top-1/2 transform -translate-y-1/2 border-4 border-transparent border-l-gray-900"></div>
             </div>
           </div>
@@ -142,19 +167,33 @@ Información adicional:
         <div className="relative group">
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className={`relative bg-gradient-to-r from-purple-600 via-purple-700 to-purple-800 hover:from-purple-700 hover:via-purple-800 hover:to-purple-900 text-white p-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 ${
+            className={`relative bg-gradient-to-r ${
+              isLandingPage 
+                ? 'from-green-600 via-green-700 to-green-800 hover:from-green-700 hover:via-green-800 hover:to-green-900' 
+                : 'from-purple-600 via-purple-700 to-purple-800 hover:from-purple-700 hover:via-purple-800 hover:to-purple-900'
+            } text-white p-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-110 ${
               isOpen ? 'rotate-180 scale-110' : 'rotate-0'
             }`}
           >
             <div className="relative z-10">
-              {isOpen ? <X size={24} /> : <Headphones size={24} />}
+              {isOpen ? (
+                <X size={24} />
+              ) : isLandingPage ? (
+                <Phone size={24} />
+              ) : (
+                <Headphones size={24} />
+              )}
             </div>
             
             {/* Anillo de pulso cuando está cerrado */}
             {!isOpen && (
               <>
-                <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-purple-700 rounded-full animate-ping opacity-20"></div>
-                <div className="absolute -inset-2 bg-gradient-to-r from-purple-600 to-purple-700 rounded-full animate-pulse opacity-10"></div>
+                <div className={`absolute -inset-1 bg-gradient-to-r ${
+                  isLandingPage ? 'from-green-600 to-green-700' : 'from-purple-600 to-purple-700'
+                } rounded-full animate-ping opacity-20`}></div>
+                <div className={`absolute -inset-2 bg-gradient-to-r ${
+                  isLandingPage ? 'from-green-600 to-green-700' : 'from-purple-600 to-purple-700'
+                } rounded-full animate-pulse opacity-10`}></div>
               </>
             )}
             
@@ -165,8 +204,13 @@ Información adicional:
           {/* Tooltip principal */}
           <div className="absolute right-full mr-4 top-1/2 transform -translate-y-1/2 bg-gray-900 text-white text-sm py-2 px-4 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap pointer-events-none shadow-xl">
             <div className="flex items-center gap-2">
-              <HelpCircle size={16} />
-              {isOpen ? 'Cerrar soporte' : '¿Necesitas ayuda?'}
+              {isLandingPage ? <Phone size={16} /> : <HelpCircle size={16} />}
+              {isOpen 
+                ? 'Cerrar' 
+                : isLandingPage 
+                  ? '¿Interesado en Ya Quedó?' 
+                  : '¿Necesitas ayuda?'
+              }
             </div>
             <div className="absolute left-full top-1/2 transform -translate-y-1/2 border-4 border-transparent border-l-gray-900"></div>
           </div>
