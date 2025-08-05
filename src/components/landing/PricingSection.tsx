@@ -167,9 +167,9 @@ export const PricingSection = () => {
                   }`}
                   size="lg"
                   onClick={() => {
-                    const planParam = plan.name === "Plan Básico" ? "basico" : 
-                                    plan.name === "Plan Profesional" ? "profesional" : "negocios";
-                    window.location.href = `/register?plan=${planParam}`;
+                    const message = `Estoy interesado en el ${plan.name} de la app de Ya Quedo`;
+                    const whatsappUrl = `https://wa.me/573183849532?text=${encodeURIComponent(message)}`;
+                    window.open(whatsappUrl, '_blank');
                   }}
                 >
                   {plan.buttonText}

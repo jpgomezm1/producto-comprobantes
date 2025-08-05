@@ -164,7 +164,7 @@ export const LoginForm = () => {
                 ¿Olvidaste tu contraseña?
               </Link>
               
-              <div className="text-sm text-gray-600">
+              {/* <div className="text-sm text-gray-600">
                 ¿Aún no tienes cuenta?{" "}
                 <Link 
                   to="/register" 
@@ -172,7 +172,7 @@ export const LoginForm = () => {
                 >
                   Crear cuenta gratis
                 </Link>
-              </div>
+              </div> */}
             </div>
             
           </CardContent>

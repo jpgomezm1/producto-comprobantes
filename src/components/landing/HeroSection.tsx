@@ -65,12 +65,14 @@ export const HeroSection = () => {
           <Button 
             size="lg"
             className="group bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white text-lg px-8 py-4 h-auto shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border-0"
-            asChild
+            onClick={() => {
+              const message = "Estoy interesado en Ya Quedo para mi negocio";
+              const whatsappUrl = `https://wa.me/573183849532?text=${encodeURIComponent(message)}`;
+              window.open(whatsappUrl, '_blank');
+            }}
           >
-            <Link to="/register">
-              Automatizar mi validación
-              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-            </Link>
+            Automatizar mi validación
+            <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
           </Button>
           
           <Button 

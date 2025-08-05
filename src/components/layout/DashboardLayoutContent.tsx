@@ -4,6 +4,7 @@ import { DashboardHeader } from "./DashboardHeader";
 import { AnimatedSidebar, SidebarBody, SidebarLink } from "@/components/ui/motion-sidebar";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Loader2, 
   Home, 
@@ -34,6 +35,7 @@ export const DashboardLayoutContent = ({ children }: DashboardLayoutContentProps
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const { user, loading, signOut } = useAuth();
+  const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
   const { currentUsage, limit, isUnlimited, loading: usageLoading } = useComprobantesUsage(profile?.selected_plan || 'basico');
@@ -41,38 +43,79 @@ export const DashboardLayoutContent = ({ children }: DashboardLayoutContentProps
   
   const { run, stepIndex, steps, handleJoyrideCallback, startOnboarding, isCompleted } = useOnboarding();
 
+  // REEMPLAZA TU useEffect EXISTENTE CON TODO ESTE BLOQUE
   useEffect(() => {
-    const fetchProfile = async () => {
-      if (user && !onboardingStatusChecked) {
-        setOnboardingStatusChecked(true);
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('full_name, business_name, user_id_card, selected_plan, onboarding_completed')
-          .eq('user_id', user.id)
-          .single();
+    // Si la información de autenticación aún está cargando, es muy pronto para hacer algo.
+    if (loading) {
+      return;
+    }
 
-        if (data && !error) {
-          setProfile(data);
-          if (!data.onboarding_completed) {
-            setTimeout(() => startOnboarding(), 500);
-          }
-        }
+    // Si la carga terminó y NO hay usuario, lo redirigimos inmediatamente al login.
+    // Esto protege todas las rutas del dashboard.
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
+    // Creamos una función interna para mantener el código ordenado.
+    // Esta función se ejecutará solo si hay un usuario logueado.
+    const checkProfileAndPermissions = async () => {
+
+      // --- INICIO DE LA LÓGICA DE SEGURIDAD ---
+
+      // Consultamos la tabla 'profiles' en Supabase.
+      // Buscamos el perfil que corresponda al ID del usuario actual.
+      const { data: userProfile, error } = await supabase
+        .from('profiles')
+        .select('*') // Pedimos todos los datos del perfil (nombre, plan, y nuestro nuevo 'is_active')
+        .eq('user_id', user.id) // Filtramos por el ID del usuario logueado
+        .single(); // Esperamos solo un resultado
+
+      // Condición de bloqueo:
+      // Si ocurrió un error, si el perfil no se encontró, o si el perfil tiene 'is_active' en 'false'...
+      if (error || !userProfile || !userProfile.is_active === false) {
+
+        // 1. Mostramos un mensaje claro y directo al usuario.
+        toast({
+          title: "Acceso Denegado",
+          description: "Tu cuenta no se encuentra activa. Por favor, contacta a soporte.",
+          variant: "destructive",
+        });
+
+        // 2. Cerramos su sesión en Supabase para invalidar su token.
+        await signOut();
+
+        // 3. Lo redirigimos forzosamente a la página de login.
+        navigate("/login");
+
+        return; // Importante: detenemos la ejecución aquí para no cargar el dashboard.
+      }
+
+      // --- FIN DE LA LÓGICA DE SEGURIDAD ---
+
+      // Si todas las verificaciones pasaron, significa que el usuario tiene permiso.
+      // Ahora, podemos guardar sus datos de perfil en el estado del componente.
+      setProfile(userProfile as UserProfile);
+      setOnboardingStatusChecked(true);
+
+      // Y continuamos con la lógica del tour de onboarding que ya tenías.
+      if (!userProfile.onboarding_completed) {
+        setTimeout(() => startOnboarding(), 500);
       }
     };
-    fetchProfile();
-  }, [user, onboardingStatusChecked, startOnboarding]);
+
+    // Llamamos a la función que acabamos de definir.
+    checkProfileAndPermissions();
+
+  // Esta lista de dependencias le dice a React que vuelva a ejecutar este efecto
+  // si cambia alguno de estos valores. Es crucial incluir todos los que usamos.
+  }, [user, loading, navigate, signOut, toast, startOnboarding]);
   
   useEffect(() => {
     if (isCompleted && profile?.onboarding_completed === false) {
       setProfile(prevProfile => prevProfile ? { ...prevProfile, onboarding_completed: true } : null);
     }
   }, [isCompleted, profile]);
-
-  useEffect(() => {
-    if (!loading && !user) {
-      navigate("/login");
-    }
-  }, [user, loading, navigate]);
 
   if (loading || !profile) {
     return (

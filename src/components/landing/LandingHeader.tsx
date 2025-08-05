@@ -64,12 +64,16 @@ export const LandingHeader = () => {
           <Button 
             size="sm"
             className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group"
-            asChild
+            onClick={() => {
+              const message = "Estoy interesado en Ya Quedo para mi negocio";
+              const whatsappUrl = `https://wa.me/573183849532?text=${encodeURIComponent(message)}`;
+              window.open(whatsappUrl, '_blank');
+            }}
           >
-            <Link to="/register" className="flex items-center gap-2">
-              Comenzar
+            <span className="flex items-center gap-2">
+              Lo Quiero!
               <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
-            </Link>
+            </span>
           </Button>
         </div>
 
@@ -129,12 +133,17 @@ export const LandingHeader = () => {
               <Button 
                 size="sm"
                 className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-lg"
-                asChild
+                onClick={() => {
+                  const message = "Estoy interesado en Ya Quedo para mi negocio";
+                  const whatsappUrl = `https://wa.me/573183849532?text=${encodeURIComponent(message)}`;
+                  window.open(whatsappUrl, '_blank');
+                  setIsMenuOpen(false);
+                }}
               >
-                <Link to="/register" className="flex items-center justify-center gap-2">
-                  Comenzar
+                <span className="flex items-center justify-center gap-2">
+                Lo Quiero!
                   <ArrowRight className="h-4 w-4" />
-                </Link>
+                </span>
               </Button>
             </div>
           </div>
