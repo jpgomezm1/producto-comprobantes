@@ -4,13 +4,19 @@ import { DashboardHeader } from "./DashboardHeader";
 import { AnimatedSidebar, SidebarBody, SidebarLink } from "@/components/ui/motion-sidebar";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Home, User, LogOut, Building, FileText } from "lucide-react";
+import { 
+  Loader2, 
+  Home, 
+  User, 
+  LogOut, 
+  Building, 
+  Zap
+} from "lucide-react";
 import { motion } from "framer-motion";
 import { useComprobantesUsage } from "@/hooks/useComprobantesUsage";
 import { UsageMeter } from "@/components/onboarding/UsageMeter";
-import { useOnboarding } from "@/hooks/useOnboarding"; // Importa el hook consumidor
+import { useOnboarding } from "@/hooks/useOnboarding";
 import { OnboardingTour } from "@/components/onboarding/OnboardingTour";
-
 
 interface UserProfile {
   full_name: string;
@@ -33,13 +39,12 @@ export const DashboardLayoutContent = ({ children }: DashboardLayoutContentProps
   const { currentUsage, limit, isUnlimited, loading: usageLoading } = useComprobantesUsage(profile?.selected_plan || 'basico');
   const [onboardingStatusChecked, setOnboardingStatusChecked] = useState(false);
   
-  // Usa el hook para consumir el estado global del onboarding
   const { run, stepIndex, steps, handleJoyrideCallback, startOnboarding, isCompleted } = useOnboarding();
 
   useEffect(() => {
     const fetchProfile = async () => {
       if (user && !onboardingStatusChecked) {
-        setOnboardingStatusChecked(true); // Previene que se ejecute múltiples veces
+        setOnboardingStatusChecked(true);
         const { data, error } = await supabase
           .from('profiles')
           .select('full_name, business_name, user_id_card, selected_plan, onboarding_completed')
@@ -49,7 +54,7 @@ export const DashboardLayoutContent = ({ children }: DashboardLayoutContentProps
         if (data && !error) {
           setProfile(data);
           if (!data.onboarding_completed) {
-            setTimeout(() => startOnboarding(), 500); // Inicia el tour si no está completado
+            setTimeout(() => startOnboarding(), 500);
           }
         }
       }
@@ -57,33 +62,29 @@ export const DashboardLayoutContent = ({ children }: DashboardLayoutContentProps
     fetchProfile();
   }, [user, onboardingStatusChecked, startOnboarding]);
   
-  // Este es el nuevo Effect que soluciona el problema del final
   useEffect(() => {
     if (isCompleted && profile?.onboarding_completed === false) {
       setProfile(prevProfile => prevProfile ? { ...prevProfile, onboarding_completed: true } : null);
     }
   }, [isCompleted, profile]);
 
-  // Proteger rutas - redirigir si no está autenticado
   useEffect(() => {
     if (!loading && !user) {
       navigate("/login");
     }
   }, [user, loading, navigate]);
 
-  // Mostrar loading mientras verifica autenticación
-  if (loading || !profile) { // Muestra el loader si el perfil no ha cargado
+  if (loading || !profile) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin text-purple-600 mx-auto mb-4" />
-          <p className="text-muted-foreground">Cargando...</p>
+          <p className="text-gray-600">Cargando...</p>
         </div>
       </div>
     );
   }
 
-  // No mostrar nada si no hay usuario (se está redirigiendo)
   if (!user) {
     return null;
   }
@@ -115,14 +116,14 @@ export const DashboardLayoutContent = ({ children }: DashboardLayoutContentProps
         handleJoyrideCallback={handleJoyrideCallback}
       />
       
-      <div className="flex h-screen w-full bg-background">
+      <div className="flex h-screen w-full bg-white">
         <AnimatedSidebar open={sidebarOpen} setOpen={setSidebarOpen}>
-          <SidebarBody className="justify-between gap-10 h-full">
+          <SidebarBody className="justify-between gap-10 h-full bg-gradient-to-b from-slate-900 to-purple-900">
             <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
               {/* Logo */}
               <div className="flex items-center gap-3 py-6 px-2">
-                <div className="h-12 w-12 bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl flex-shrink-0 flex items-center justify-center shadow-lg">
-                  <FileText className="h-7 w-7 text-white" />
+                <div className="h-10 w-10 bg-purple-600 rounded-lg flex-shrink-0 flex items-center justify-center">
+                  <Zap className="h-5 w-5 text-white" />
                 </div>
                 <motion.div
                   animate={{
@@ -131,22 +132,21 @@ export const DashboardLayoutContent = ({ children }: DashboardLayoutContentProps
                   }}
                   className="whitespace-pre"
                 >
-                  <h1 className="font-bold text-white text-xl leading-tight">Ya Quedo</h1>
-                  <p className="text-purple-200 text-sm font-medium">Sistema de Comprobantes</p>
+                  <h1 className="font-semibold text-white text-lg">Ya Quedo</h1>
                 </motion.div>
               </div>
               
-              {/* Navigation Links */}
-              <div className="mt-6 flex flex-col gap-2 px-2">
+              {/* Navigation con mejor contraste */}
+              <div className="mt-6 flex flex-col gap-1 px-2">
                 {navigationItems.map((link, idx) => (
                   <SidebarLink 
                     key={idx} 
                     link={link} 
                     isActive={location.pathname === link.href}
                     className={`
-                      flex items-center justify-start gap-3 py-3 px-3 rounded-xl 
-                      transition-all duration-200 text-purple-200 hover:bg-purple-700/50 hover:text-white
-                      ${location.pathname === link.href ? 'bg-purple-600 text-white hover:bg-purple-600 shadow-lg border border-purple-400/30' : ''}
+                      flex items-center justify-start gap-3 py-3 px-3 rounded-lg 
+                      transition-colors duration-200 text-slate-300 hover:text-white hover:bg-white/10
+                      ${location.pathname === link.href ? 'bg-white/20 text-white hover:bg-white/20 hover:text-white' : ''}
                     `}
                     data-tour-id={link.href === '/profile' ? 'profile-link' : undefined}
                   />
@@ -154,34 +154,19 @@ export const DashboardLayoutContent = ({ children }: DashboardLayoutContentProps
               </div>
             </div>
             
-            {/* User Section */}
-            <div className="border-t border-purple-700/50 pt-6 px-2">
-              {/* Información del usuario */}
+            {/* User Section con mejor contraste */}
+            <div className="border-t border-white/20 pt-6 px-2">
+              {/* Info del usuario */}
               {profile && sidebarOpen && (
-                <div className="mb-6 p-4 bg-gradient-to-r from-purple-700/30 to-purple-600/30 rounded-xl border border-purple-600/20">
-                  <div className="flex items-start gap-3 mb-3">
-                    <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
-                      <User className="h-4 w-4 text-white" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold text-white truncate">{profile.full_name}</p>
-                      <p className="text-xs text-purple-200">ID: {profile.user_id_card}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
-                      <Building className="h-4 w-4 text-white" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm text-purple-100 truncate font-medium">{profile.business_name}</p>
-                    </div>
-                  </div>
+                <div className="mb-4 p-3 bg-white/10 rounded-lg backdrop-blur-sm">
+                  <p className="text-sm font-medium text-white truncate">{profile.full_name}</p>
+                  <p className="text-xs text-slate-300 truncate">{profile.business_name}</p>
                 </div>
               )}
 
-              {/* Indicador de uso de comprobantes */}
+              {/* Usage meter */}
               {profile && sidebarOpen && !usageLoading && (
-                <div className="mb-6">
+                <div className="mb-4">
                   <UsageMeter
                     currentUsage={currentUsage}
                     limit={limit}
@@ -191,44 +176,38 @@ export const DashboardLayoutContent = ({ children }: DashboardLayoutContentProps
                 </div>
               )}
               
+              {/* Logout con mejor contraste */}
               <div 
                 onClick={handleLogout}
-                className="flex items-center justify-start gap-3 py-3 px-3 rounded-xl hover:bg-red-600 hover:text-white text-purple-200 transition-all duration-200 cursor-pointer group mb-4"
+                className="flex items-center justify-start gap-3 py-3 px-3 rounded-lg hover:bg-red-600/20 hover:text-red-300 text-slate-300 transition-colors duration-200 cursor-pointer mb-4"
               >
-                <div className="h-5 w-5 flex-shrink-0">
-                  <LogOut className="h-5 w-5" />
-                </div>
+                <LogOut className="h-5 w-5 flex-shrink-0" />
                 <motion.span
                   animate={{
                     display: sidebarOpen ? "inline-block" : "none",
                     opacity: sidebarOpen ? 1 : 0,
                   }}
-                  className="text-sm font-medium group-hover:translate-x-1 transition-transform duration-150 whitespace-pre inline-block !p-0 !m-0"
+                  className="text-sm font-medium whitespace-pre inline-block !p-0 !m-0"
                 >
                   Cerrar Sesión
                 </motion.span>
               </div>
               
-              {/* Footer info with Logo */}
+              {/* Footer */}
               <motion.div
                 animate={{
                   display: sidebarOpen ? "block" : "none",
                   opacity: sidebarOpen ? 1 : 0,
                 }}
-                className="pt-4 border-t border-purple-700/50"
+                className="pt-4 border-t border-white/20"
               >
-                <div className="text-center space-y-3">
-                  <div className="flex items-center justify-center gap-2">
-                    <img 
-                      src="https://storage.googleapis.com/cluvi/nuevo_irre-removebg-preview.png" 
-                      alt="Irrelevant Logo" 
-                      className="h-6 w-auto opacity-80"
-                    />
-                  </div>
-                  <div className="text-xs text-purple-400 space-y-1">
-                    <p className="font-medium">© 2025</p>
-                    <p className="text-purple-500">v1.0.0</p>
-                  </div>
+                <div className="text-center">
+                  <img 
+                    src="https://storage.googleapis.com/cluvi/nuevo_irre-removebg-preview.png" 
+                    alt="Irrelevant Logo" 
+                    className="h-5 w-auto mx-auto opacity-70"
+                  />
+                  <p className="text-xs text-slate-400 mt-2">© 2025</p>
                 </div>
               </motion.div>
             </div>
@@ -237,7 +216,7 @@ export const DashboardLayoutContent = ({ children }: DashboardLayoutContentProps
         
         {/* Main Content */}
         <div className="flex-1 flex flex-col overflow-hidden">
-          <main className="flex-1 overflow-auto p-6 bg-gray-50">
+          <main className="flex-1 overflow-auto bg-gray-50">
             {children}
           </main>
         </div>
