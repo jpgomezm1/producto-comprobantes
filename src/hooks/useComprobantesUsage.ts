@@ -16,7 +16,10 @@ export const useComprobantesUsage = (selectedPlan: string) => {
   const fetchCurrentUsage = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        setLoading(false);
+        return;
+      }
 
       // Obtener comprobantes del mes actual
       const now = new Date();
@@ -52,6 +55,8 @@ export const useComprobantesUsage = (selectedPlan: string) => {
     } catch (error) {
       console.error('Error fetching comprobantes usage:', error);
       setCurrentUsage(0);
+      setValidCount(0);
+      setInvalidCount(0);
     } finally {
       setLoading(false);
     }
