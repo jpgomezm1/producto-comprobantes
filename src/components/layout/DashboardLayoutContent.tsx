@@ -25,6 +25,7 @@ interface UserProfile {
   user_id_card: string;
   selected_plan: string;
   onboarding_completed: boolean;
+  is_active?: boolean; // Agregar esta propiedad como opcional
 }
 
 interface DashboardLayoutContentProps {
@@ -43,7 +44,6 @@ export const DashboardLayoutContent = ({ children }: DashboardLayoutContentProps
   
   const { run, stepIndex, steps, handleJoyrideCallback, startOnboarding, isCompleted } = useOnboarding();
 
-  // REEMPLAZA TU useEffect EXISTENTE CON TODO ESTE BLOQUE
   useEffect(() => {
     // Si la información de autenticación aún está cargando, es muy pronto para hacer algo.
     if (loading) {
@@ -51,64 +51,80 @@ export const DashboardLayoutContent = ({ children }: DashboardLayoutContentProps
     }
 
     // Si la carga terminó y NO hay usuario, lo redirigimos inmediatamente al login.
-    // Esto protege todas las rutas del dashboard.
     if (!user) {
       navigate("/login");
       return;
     }
 
-    // Creamos una función interna para mantener el código ordenado.
-    // Esta función se ejecutará solo si hay un usuario logueado.
+    // Función para verificar el perfil y permisos
     const checkProfileAndPermissions = async () => {
+      try {
+        // Consultamos la tabla 'profiles' en Supabase
+        const { data: userProfile, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
 
-      // --- INICIO DE LA LÓGICA DE SEGURIDAD ---
+        // Si hay error al consultar el perfil
+        if (error) {
+          console.error('Error fetching profile:', error);
+          toast({
+            title: "Error de acceso",
+            description: "No se pudo cargar tu perfil. Intenta nuevamente.",
+            variant: "destructive",
+          });
+          await signOut();
+          navigate("/login");
+          return;
+        }
 
-      // Consultamos la tabla 'profiles' en Supabase.
-      // Buscamos el perfil que corresponda al ID del usuario actual.
-      const { data: userProfile, error } = await supabase
-        .from('profiles')
-        .select('*') // Pedimos todos los datos del perfil (nombre, plan, y nuestro nuevo 'is_active')
-        .eq('user_id', user.id) // Filtramos por el ID del usuario logueado
-        .single(); // Esperamos solo un resultado
+        // Si no se encontró el perfil
+        if (!userProfile) {
+          toast({
+            title: "Perfil no encontrado",
+            description: "Tu perfil no existe. Contacta a soporte.",
+            variant: "destructive",
+          });
+          await signOut();
+          navigate("/login");
+          return;
+        }
 
-      // Condición de bloqueo:
-      // Si ocurrió un error, si el perfil no se encontró, o si el perfil tiene 'is_active' en 'false'...
-      if (error || !userProfile || !userProfile.is_active === false) {
+        // Verificar si la cuenta está activa (solo si existe la propiedad is_active)
+        if (userProfile.is_active !== undefined && userProfile.is_active === false) {
+          toast({
+            title: "Acceso Denegado",
+            description: "Tu cuenta no se encuentra activa. Por favor, contacta a soporte.",
+            variant: "destructive",
+          });
+          await signOut();
+          navigate("/login");
+          return;
+        }
 
-        // 1. Mostramos un mensaje claro y directo al usuario.
+        // Si todas las verificaciones pasaron
+        setProfile(userProfile as UserProfile);
+        setOnboardingStatusChecked(true);
+
+        // Lógica del onboarding
+        if (!userProfile.onboarding_completed) {
+          setTimeout(() => startOnboarding(), 500);
+        }
+
+      } catch (error) {
+        console.error('Unexpected error:', error);
         toast({
-          title: "Acceso Denegado",
-          description: "Tu cuenta no se encuentra activa. Por favor, contacta a soporte.",
+          title: "Error inesperado",
+          description: "Ocurrió un error inesperado. Intenta nuevamente.",
           variant: "destructive",
         });
-
-        // 2. Cerramos su sesión en Supabase para invalidar su token.
         await signOut();
-
-        // 3. Lo redirigimos forzosamente a la página de login.
         navigate("/login");
-
-        return; // Importante: detenemos la ejecución aquí para no cargar el dashboard.
-      }
-
-      // --- FIN DE LA LÓGICA DE SEGURIDAD ---
-
-      // Si todas las verificaciones pasaron, significa que el usuario tiene permiso.
-      // Ahora, podemos guardar sus datos de perfil en el estado del componente.
-      setProfile(userProfile as UserProfile);
-      setOnboardingStatusChecked(true);
-
-      // Y continuamos con la lógica del tour de onboarding que ya tenías.
-      if (!userProfile.onboarding_completed) {
-        setTimeout(() => startOnboarding(), 500);
       }
     };
 
-    // Llamamos a la función que acabamos de definir.
     checkProfileAndPermissions();
-
-  // Esta lista de dependencias le dice a React que vuelva a ejecutar este efecto
-  // si cambia alguno de estos valores. Es crucial incluir todos los que usamos.
   }, [user, loading, navigate, signOut, toast, startOnboarding]);
   
   useEffect(() => {
