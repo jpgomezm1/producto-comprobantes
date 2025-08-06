@@ -15,7 +15,7 @@ export const LandingHeader = () => {
             <Zap className="h-5 w-5 text-white" />
           </div>
           <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-            Ya Quedo
+          Ya Quedó
           </h1>
         </div>
 
