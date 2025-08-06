@@ -97,9 +97,12 @@ export const PricingSection = () => {
                   {plan.name}
                 </CardTitle>
                 
-                {/* Precio en COP */}
+                {/* Precio en COP con + IVA */}
                 <div className="mb-4">
-                  <div className="text-3xl font-bold text-purple-600 mb-1">{plan.emoji} {plan.price}</div>
+                  <div className="flex items-center justify-center gap-2">
+                    <span className="text-3xl font-bold text-purple-600">{plan.emoji} {plan.price}</span>
+                    <span className="text-sm text-gray-500 font-medium">+ IVA</span>
+                  </div>
                   <div className="text-gray-500">{plan.period}</div>
                 </div>
 
