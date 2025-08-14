@@ -15,6 +15,10 @@ export interface Comprobante {
   estado_transaccion?: string;
   observaciones?: string;
   es_valido: boolean;
+  imagen_url?: string | null;
+  imagen_filename?: string | null;
+  imagen_gcs_path?: string | null;
+  imagen_size_bytes?: number | null;
   created_at: string;
   updated_at: string;
 }

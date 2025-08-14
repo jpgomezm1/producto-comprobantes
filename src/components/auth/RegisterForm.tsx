@@ -495,8 +495,8 @@ export const RegisterForm = () => {
                 </div>
               </form>
 
-              {/* Link de login */}
-              <div className="text-center pt-4 border-t border-gray-100">
+              {/* Links adicionales */}
+              <div className="text-center pt-4 border-t border-gray-100 space-y-4">
                 <div className="text-sm text-gray-600">
                   ¿Ya tienes cuenta?{" "}
                   <Link 
@@ -504,6 +504,17 @@ export const RegisterForm = () => {
                     className="text-purple-600 hover:text-purple-700 hover:underline font-semibold"
                   >
                     Inicia sesión aquí
+                  </Link>
+                </div>
+                
+                {/* Botón prominente para regresar a landing */}
+                <div>
+                  <Link 
+                    to="/" 
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 hover:text-purple-600 hover:border-purple-200 transition-all duration-200"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                    Volver al inicio
                   </Link>
                 </div>
               </div>

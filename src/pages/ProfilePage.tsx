@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { useProfile } from '@/hooks/useProfile';
+import { useComprobantesUsage } from '@/hooks/useComprobantesUsage';
 import { UserBankAccountFormData } from '@/types/profile';
 import { 
   Plus, 
@@ -18,16 +19,22 @@ import {
   Shield,
   Eye,
   EyeOff,
-  Zap
+  Zap,
+  BarChart3,
+  ArrowUp,
+  MessageCircle,
+  Crown
 } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useOnboarding } from '@/hooks/useOnboarding';
 
 const ProfilePage = () => {
   const { loading, profile, accounts, addBankAccount, deleteBankAccount, getUserEmail } = useProfile();
+  const { currentUsage, limit, isUnlimited, loading: usageLoading } = useComprobantesUsage(profile?.selected_plan || 'basico');
   const { goToStep } = useOnboarding();
   const [userEmail, setUserEmail] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isUpgradeDialogOpen, setIsUpgradeDialogOpen] = useState(false);
   const [maskedAccounts, setMaskedAccounts] = useState<{[key: string]: boolean}>({});
   const [formData, setFormData] = useState<UserBankAccountFormData>({
     account_nickname: '',
@@ -76,6 +83,23 @@ const ProfilePage = () => {
     }));
   };
 
+  const handleWhatsAppRedirect = (messageType: 'upgrade' | 'credits') => {
+    const whatsappNumber = '573024097476'; // Número de WhatsApp
+    const currentPlan = profile?.selected_plan || 'basico';
+    
+    let message = '';
+    
+    if (messageType === 'upgrade') {
+      message = `Hola! Me gustaría hacer upgrade de mi plan actual (${currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)}) a un plan superior. Mi correo es: ${userEmail}`;
+    } else {
+      message = `Hola! Me gustaría comprar créditos adicionales para mi cuenta. Plan actual: ${currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)}. Créditos usados: ${currentUsage}/${isUnlimited ? 'Ilimitado' : limit}. Mi correo es: ${userEmail}`;
+    }
+    
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+    setIsUpgradeDialogOpen(false);
+  };
+
   if (loading) {
     return (
       <DashboardLayout>
@@ -114,33 +138,120 @@ const ProfilePage = () => {
 
   return (
     <DashboardLayout>
-      <div className="p-6 space-y-8">
+      <div className="p-4 md:p-6 pt-4 md:pt-6 space-y-6 md:space-y-8">
         {/* Header */}
-        <div className="flex items-center gap-4">
-          <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
-            <User className="h-8 w-8 text-white" />
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0">
+            <User className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
           </div>
-          <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
               Mi Perfil
             </h1>
-            <p className="text-gray-600">Gestiona tu información personal y cuentas bancarias</p>
+            <p className="text-sm sm:text-base text-gray-600">Gestiona tu información personal y cuentas bancarias</p>
           </div>
         </div>
         
-        <div className="grid gap-6 lg:grid-cols-2">
+        {/* Sección de créditos disponibles */}
+        {!usageLoading && (
+          <Card className="shadow-lg border-0 bg-gradient-to-r from-purple-50 to-indigo-50 backdrop-blur-sm">
+            <CardContent className="pt-4 sm:pt-6">
+              {/* Layout responsivo: vertical en móviles, horizontal en desktop */}
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6">
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0">
+                    <BarChart3 className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                      Créditos Disponibles
+                    </h2>
+                    <p className="text-sm sm:text-base text-gray-600">Uso mensual de comprobantes</p>
+                  </div>
+                </div>
+                
+                <div className="flex flex-col sm:text-right items-start sm:items-end gap-3">
+                  {/* Stats */}
+                  <div className="flex items-center sm:items-end justify-between sm:justify-end w-full sm:w-auto gap-4 sm:gap-0">
+                    <div className="sm:text-right">
+                      {isUnlimited ? (
+                        <div>
+                          <div className="text-2xl sm:text-3xl font-bold text-purple-600">{currentUsage}</div>
+                          <div className="text-sm text-gray-500">Comprobantes usados</div>
+                        </div>
+                      ) : (
+                        <div>
+                          <div className="text-2xl sm:text-3xl font-bold text-purple-600">{limit - currentUsage}</div>
+                          <div className="text-sm text-gray-500">Créditos restantes</div>
+                          <div className="text-xs text-gray-400 mt-1">
+                            {currentUsage} / {limit} usados
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Badge para ilimitado - solo en móviles lo mostramos aquí */}
+                    {isUnlimited && (
+                      <Badge className="sm:hidden bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-700 border-purple-200 px-3 py-1">
+                        <Zap className="h-3 w-3 mr-1" />
+                        Ilimitado
+                      </Badge>
+                    )}
+                  </div>
+                  
+                  {/* Badge para ilimitado - en desktop */}
+                  {isUnlimited && (
+                    <Badge className="hidden sm:flex bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-700 border-purple-200 px-3 py-1">
+                      <Zap className="h-3 w-3 mr-1" />
+                      Ilimitado
+                    </Badge>
+                  )}
+                  
+                  {/* Botón de Upgrade */}
+                  <Button 
+                    onClick={() => setIsUpgradeDialogOpen(true)}
+                    className="w-full sm:w-auto bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-lg text-sm px-4 py-2"
+                    size="sm"
+                  >
+                    <ArrowUp className="h-4 w-4 mr-2" />
+                    Mejorar Plan
+                  </Button>
+                </div>
+              </div>
+              
+              {!isUnlimited && (
+                <div className="mt-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-gray-700">Progreso mensual</span>
+                    <span className="text-sm text-gray-500">
+                      {Math.round((currentUsage / limit) * 100)}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-3">
+                    <div 
+                      className="bg-gradient-to-r from-purple-600 to-indigo-600 h-3 rounded-full transition-all duration-300"
+                      style={{ width: `${Math.min((currentUsage / limit) * 100, 100)}%` }}
+                    ></div>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+        
+        <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
           {/* Información del Usuario */}
           <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
-            <CardHeader className="pb-4">
-              <CardTitle className="flex items-center gap-3 text-xl">
-                <div className="p-2 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-lg">
-                  <Shield className="h-5 w-5 text-purple-600" />
+            <CardHeader className="pb-3 sm:pb-4">
+              <CardTitle className="flex items-center gap-2 sm:gap-3 text-lg sm:text-xl">
+                <div className="p-2 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-lg flex-shrink-0">
+                  <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
                 </div>
                 <span className="text-gray-900">Información Personal</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
+            <CardContent className="space-y-4 sm:space-y-6">
+              <div className="space-y-3 sm:space-y-4">
                 <div>
                   <Label className="text-sm font-semibold text-gray-700 flex items-center gap-2 mb-2">
                     <User className="h-4 w-4 text-purple-600" />
@@ -205,12 +316,12 @@ const ProfilePage = () => {
 
           {/* Cuentas Bancarias */}
           <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
-            <CardHeader className="flex flex-row items-center justify-between pb-4">
-              <CardTitle className="flex items-center gap-3 text-xl">
-                <div className="p-2 bg-gradient-to-br from-green-100 to-emerald-100 rounded-lg">
-                  <CreditCard className="h-5 w-5 text-green-600" />
+            <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 sm:pb-4 gap-3 sm:gap-4">
+              <CardTitle className="flex items-center gap-2 sm:gap-3 text-lg sm:text-xl">
+                <div className="p-2 bg-gradient-to-br from-green-100 to-emerald-100 rounded-lg flex-shrink-0">
+                  <CreditCard className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <span className="text-gray-900">Cuentas de Recaudo</span>
                   <div className="flex items-center gap-2 mt-1">
                     <Badge className="bg-green-50 text-green-700 border-green-200 text-xs px-2 py-0.5">
@@ -223,8 +334,9 @@ const ProfilePage = () => {
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
                   <Button 
-                    className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-lg"
+                    className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-lg text-sm"
                     data-tour-id="add-account-button"
+                    size="sm"
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     Añadir Cuenta
@@ -379,6 +491,90 @@ const ProfilePage = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Dialog de Upgrade */}
+        <Dialog open={isUpgradeDialogOpen} onOpenChange={setIsUpgradeDialogOpen}>
+          <DialogContent className="sm:max-w-md max-w-[95vw] max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 sm:gap-3 text-lg sm:text-xl">
+                <div className="p-2 bg-gradient-to-br from-green-100 to-emerald-100 rounded-lg flex-shrink-0">
+                  <Crown className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
+                </div>
+                <span className="truncate">Mejorar tu Plan</span>
+              </DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-4 sm:space-y-6 pt-2 sm:pt-4">
+              <div className="text-center">
+                <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
+                  ¿Cómo te gustaría mejorar tu experiencia con Ya Quedo?
+                </p>
+              </div>
+              
+              <div className="space-y-3 sm:space-y-4">
+                {/* Upgrade de Plan */}
+                <div 
+                  onClick={() => handleWhatsAppRedirect('upgrade')}
+                  className="group p-3 sm:p-4 border-2 border-dashed border-green-200 rounded-xl hover:border-green-300 hover:bg-green-50/50 cursor-pointer transition-all duration-200 active:scale-95"
+                >
+                  <div className="flex items-start sm:items-center gap-3 sm:gap-4">
+                    <div className="p-2 sm:p-3 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl group-hover:scale-110 transition-transform flex-shrink-0">
+                      <Crown className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-gray-900 group-hover:text-green-700 transition-colors text-sm sm:text-base">
+                        Upgrade de Plan
+                      </h3>
+                      <p className="text-xs sm:text-sm text-gray-600 mt-1 leading-relaxed">
+                        Cambia a un plan superior con más beneficios
+                      </p>
+                      <div className="flex items-center gap-1 mt-2">
+                        <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-600 flex-shrink-0" />
+                        <span className="text-xs text-green-600 font-medium">Contactar por WhatsApp</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Comprar Créditos Adicionales */}
+                {!isUnlimited && (
+                  <div 
+                    onClick={() => handleWhatsAppRedirect('credits')}
+                    className="group p-3 sm:p-4 border-2 border-dashed border-purple-200 rounded-xl hover:border-purple-300 hover:bg-purple-50/50 cursor-pointer transition-all duration-200 active:scale-95"
+                  >
+                    <div className="flex items-start sm:items-center gap-3 sm:gap-4">
+                      <div className="p-2 sm:p-3 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-xl group-hover:scale-110 transition-transform flex-shrink-0">
+                        <Zap className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-gray-900 group-hover:text-purple-700 transition-colors text-sm sm:text-base">
+                          Comprar Créditos Extra
+                        </h3>
+                        <p className="text-xs sm:text-sm text-gray-600 mt-1 leading-relaxed">
+                          Agrega créditos adicionales a tu plan actual
+                        </p>
+                        <div className="flex items-center gap-1 mt-2">
+                          <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4 text-purple-600 flex-shrink-0" />
+                          <span className="text-xs text-purple-600 font-medium">Contactar por WhatsApp</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              <div className="pt-3 sm:pt-4 border-t">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsUpgradeDialogOpen(false)}
+                  className="w-full text-sm sm:text-base py-2 sm:py-3"
+                >
+                  Cancelar
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </DashboardLayout>
   );

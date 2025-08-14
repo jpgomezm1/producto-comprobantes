@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Menu, X, Zap, ArrowRight } from "lucide-react";
+import { Menu, X, ArrowRight } from "lucide-react";
 import { useState } from "react";
 
 export const LandingHeader = () => {
@@ -8,15 +8,14 @@ export const LandingHeader = () => {
 
   return (
     <header className="bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm sticky top-0 z-50">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+      <div className="container mx-auto px-4 h-20 flex items-center justify-between">
         {/* Logo y título */}
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-lg flex items-center justify-center">
-            <Zap className="h-5 w-5 text-white" />
-          </div>
-          <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-          Ya Quedó
-          </h1>
+          <img 
+            src="https://storage.googleapis.com/cluvi/Ya_Quedo/Ya%20quedo%CC%81%20ready.PNG" 
+            alt="Ya Quedo Logo" 
+            className="h-8 w-auto object-contain md:h-8 lg:h-10"
+          />
         </div>
 
         {/* Navegación central - Desktop */}

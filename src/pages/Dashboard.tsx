@@ -6,8 +6,10 @@ import { isWithinInterval, parseISO } from 'date-fns';
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { StatsCards } from "@/components/dashboard/StatsCards";
 import { DashboardFilters, FilterState } from "@/components/dashboard/DashboardFilters";
+import { ExcelExportDialog } from "@/components/dashboard/ExcelExportDialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
@@ -24,7 +26,8 @@ import {
   ZoomIn,
   TrendingUp,
   Activity,
-  Shield
+  Shield,
+  Download
 } from "lucide-react";
 
 // Utils y Tipos
@@ -42,6 +45,7 @@ const Dashboard = () => {
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
+  const [excelDialogOpen, setExcelDialogOpen] = useState(false);
 
   // Comprobantes filtrados
   const filteredComprobantes = useMemo(() => {
@@ -153,15 +157,15 @@ const Dashboard = () => {
           </div>
         )}
         {imageError && (
-          <div className="w-full h-full bg-gray-100 rounded flex items-center justify-center">
+          <div className="w-full h-full bg-red-50 rounded flex items-center justify-center border border-red-200">
             <XCircle className="w-4 h-4 text-red-500" />
           </div>
         )}
         <img
           src={imageUrl}
           alt={alt}
-          className={`w-full h-full object-cover rounded transition-opacity duration-200 ${
-            imageLoaded ? 'opacity-100' : 'opacity-0'
+          className={`w-full h-full object-cover rounded transition-all duration-300 ${
+            imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
           }`}
           onLoad={() => setImageLoaded(true)}
           onError={() => setImageError(true)}
@@ -224,7 +228,20 @@ const Dashboard = () => {
                 </div>
               </CardTitle>
               
-              <DashboardFilters onFilterChange={setFilters} />
+              <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center w-full">
+                <div className="flex-1 w-full lg:w-auto">
+                  <DashboardFilters onFilterChange={setFilters} />
+                </div>
+                <Button
+                  onClick={() => setExcelDialogOpen(true)}
+                  className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-0 shadow-md px-4 py-2 h-10 text-sm font-medium transition-all duration-200 flex items-center gap-2 whitespace-nowrap self-start lg:self-center"
+                  disabled={filteredComprobantes.length === 0}
+                >
+                  <Download className="h-4 w-4" />
+                  <span className="hidden sm:inline">Descargar Excel</span>
+                  <span className="sm:hidden">Excel</span>
+                </Button>
+              </div>
             </div>
           </CardHeader>
           
@@ -296,9 +313,25 @@ const Dashboard = () => {
                         
                         <TableCell className="py-5">
                           <div className="flex justify-center">
-                            <div className="w-16 h-12 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg flex items-center justify-center border-2 border-gray-200 hover:border-purple-300 transition-colors cursor-pointer group">
-                              <ImageIcon className="w-4 h-4 text-gray-400 group-hover:text-purple-500 transition-colors" />
-                            </div>
+                            {comprobante.imagen_url ? (
+                              <div 
+                                className="relative w-16 h-12 bg-gray-100 rounded-lg overflow-hidden border-2 border-gray-200 hover:border-purple-300 transition-all cursor-pointer group hover:shadow-md"
+                                onClick={() => handleImageView(comprobante.imagen_url!)}
+                              >
+                                <ImagePreview 
+                                  imageUrl={comprobante.imagen_url} 
+                                  alt={`Comprobante ${comprobante.numero_comprobante || comprobante.id}`}
+                                  className="w-full h-full"
+                                />
+                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                                  <ZoomIn className="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="w-16 h-12 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg flex items-center justify-center border-2 border-gray-200">
+                                <ImageIcon className="w-4 h-4 text-gray-400" />
+                              </div>
+                            )}
                           </div>
                         </TableCell>
                         
@@ -450,6 +483,13 @@ const Dashboard = () => {
             )}
           </DialogContent>
         </Dialog>
+
+        {/* Excel Export Dialog */}
+        <ExcelExportDialog 
+          isOpen={excelDialogOpen}
+          onClose={() => setExcelDialogOpen(false)}
+          comprobantes={filteredComprobantes}
+        />
       </div>
     </DashboardLayout>
   );

@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+// import { useWelcome } from '@/contexts/WelcomeContext';
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  // const { triggerWelcome } = useWelcome();
 
   useEffect(() => {
     // Configurar listener de cambios de autenticación
@@ -30,38 +32,60 @@ export const useAuth = () => {
   }, []);
 
   const signIn = async (email: string, password: string) => {
+    setLoading(true);
+    
     try {
-      setLoading(true);
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error, data } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
-        throw error;
+        setLoading(false);
+        const errorMessage = 
+          error.message === 'Invalid login credentials' 
+            ? 'Credenciales inválidas. Verifica tu email y contraseña.'
+            : 'Error al iniciar sesión. Inténtalo de nuevo.';
+        
+        toast({
+          title: "Error al iniciar sesión",
+          description: errorMessage,
+          variant: "destructive",
+        });
+        
+        return { error: error.message };
       }
 
-      toast({
-        title: "¡Bienvenido!",
-        description: "Has iniciado sesión correctamente.",
-      });
+      // Login exitoso - mostrar welcome dialog
+      if (data?.user && data?.session) {
+        // Pequeño delay para asegurar que el estado se actualice primero
+        setTimeout(() => {
+          // Obtener nombre del email o usar email completo
+          const userName = data.user.email || 'Usuario';
+          // Disparar evento personalizado para el welcome dialog
+          window.dispatchEvent(new CustomEvent('loginSuccess', { 
+            detail: { userName } 
+          }));
+        }, 500);
+        
+        setLoading(false);
+        return { error: null };
+      }
 
-      return { error: null };
-    } catch (error: any) {
-      const errorMessage = 
-        error.message === 'Invalid login credentials' 
-          ? 'Credenciales inválidas. Verifica tu email y contraseña.'
-          : 'Error al iniciar sesión. Inténtalo de nuevo.';
+      // Caso inesperado - no hay error pero tampoco usuario
+      setLoading(false);
+      return { error: null }; // Cambiamos esto para no mostrar error si el login técnicamente funcionó
       
+    } catch (error: any) {
+      setLoading(false);
+      // Solo mostrar error si realmente hubo una excepción
       toast({
         title: "Error al iniciar sesión",
-        description: errorMessage,
+        description: 'Error de conexión. Inténtalo de nuevo.',
         variant: "destructive",
       });
       
       return { error: error.message };
-    } finally {
-      setLoading(false);
     }
   };
 

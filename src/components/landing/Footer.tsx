@@ -8,7 +8,7 @@ export const Footer = () => {
         <div className="py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Ya Quedo Info */}
           <div className="lg:col-span-2">
-            <h3 className="text-2xl font-bold text-white mb-4">Ya Quedo</h3>
+            <h3 className="text-2xl font-bold text-white mb-4">Ya Quedó</h3>
             <p className="text-gray-300 leading-relaxed mb-6 max-w-md">
               La solución que automatiza la validación de comprobantes y elimina el fraude en tu negocio. 
               Recupera tu tiempo y protege tu dinero.
@@ -26,7 +26,7 @@ export const Footer = () => {
               </div>
               <div className="flex items-center gap-3 text-gray-300">
                 <MapPin className="h-4 w-4 text-purple-400" />
-                <span className="text-sm">Medellin, Colombia</span>
+                <span className="text-sm">Medellín, Colombia</span>
               </div>
             </div>
           </div>
@@ -113,7 +113,7 @@ export const Footer = () => {
 
             {/* Copyright and legal */}
             <div className="flex flex-col md:flex-row items-center gap-6 text-sm text-gray-400">
-              <span>© 2025 Ya Quedo. Todos los derechos reservados.</span>
+              <span>© 2025 Ya Quedó. Todos los derechos reservados.</span>
               
               <div className="flex items-center gap-6">
                 <a 

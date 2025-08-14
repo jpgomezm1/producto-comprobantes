@@ -6,42 +6,44 @@ import {
   CheckCircle,
   TrendingUp,
   Bot,
-  RefreshCw
+  RefreshCw,
+  DollarSign,
+  Users
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 const features = [
   {
     icon: Zap,
-    title: "Validación Automática",
-    description: "Ya no tienes que entrar a Nequi, Bancolombia o Davivienda a revisar uno por uno. Ya Quedó valida todo solito y te dice qué pagos sí entraron.",
-    benefit: "Siempre activo",
+    title: "2 Segundos vs. 3 Horas",
+    description: "Ya no más entrar a Nequi o Bancolombia a revisar uno por uno. Ya Quedó valida todo automáticamente mientras tú haces otras cosas.",
+    benefit: "Recuperas 4+ horas diarias",
     color: "purple",
-    emoji: "🔌"
+    emoji: "⚡"
   },
   {
     icon: Shield,
-    title: "Detección de Fraudes",
-    description: "Olvídate de los comprobantes \"truchos\". La app detecta cuando algo no cuadra y te avisa al momento.",
-    benefit: "Protege tu negocio",
+    title: "Cero Comprobantes Falsos",
+    description: "Se acabaron las estafas. Detectamos el 99.9% de fraudes al instante y te alertamos ANTES de que pierdas dinero.",
+    benefit: "Proteges tu dinero automáticamente",
     color: "red",
     emoji: "🛡️"
   },
   {
     icon: RefreshCw,
-    title: "Conciliación Automática",
-    description: "Se acabaron los excels eternos. Los pagos y comprobantes se organizan solos, sin que pierdas tiempo.",
-    benefit: "Todo sincronizado",
+    title: "Adiós Excel de Pagos",
+    description: "Los pagos se organizan solos. Sabes al instante: qué cliente pagó, cuánto falta y qué facturas están pendientes.",
+    benefit: "20+ horas extra semanales",
     color: "green",
     emoji: "📊"
   },
   {
     icon: TrendingUp,
-    title: "Reportes en Tiempo Real",
-    description: "En un solo lugar ves qué pagos entraron, cuáles no y cuánto llevas recibido. Así tomas decisiones rápido.",
-    benefit: "Todo claro de un vistazo",
+    title: "Tu Dinero en Tiempo Real",
+    description: "Dashboard que muestra pagos del día, cuánto llevas recibido y cuanto haz vendido. No esperes que tus colaboradores te cuenten como van las ventas.",
+    benefit: "Controlas todo de un vistazo",
     color: "indigo",
-    emoji: "⚡"
+    emoji: "📈"
   }
 ];
 
@@ -49,26 +51,25 @@ export const FeaturesSection = () => {
   return (
     <section id="caracteristicas" className="py-24 px-4 bg-gradient-to-b from-white to-purple-50/30">
       <div className="container mx-auto max-w-7xl">
-        {/* Header mejorado */}
+        {/* Header simplificado pero impactante */}
         <div className="text-center mb-20">
           <div className="inline-flex items-center gap-2 bg-purple-50 text-purple-700 border border-purple-200 rounded-full px-4 py-2 text-sm font-medium mb-6">
             <Bot className="h-4 w-4" />
-            <span>Automatización inteligente</span>
+            <span>Automatización que genera resultados</span>
           </div>
           
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            👉 La ayuda que tu negocio necesitaba para
-            <span className="bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent block">
-              nunca más validar a mano.
-            </span>
-          </h2>
-          
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Mientras otros pierden tiempo revisando comprobantes, tú ya sabes al instante si la plata sí entró.
-          </p>
+          <div className="py-4">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 mb-8" style={{ lineHeight: '1.3' }}>
+              🎯 Mientras otros pierden tiempo,
+              <span className="bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent block">
+                tú ya estás ganando dinero
+              </span>
+            </h2>
+          </div>
+
         </div>
 
-        {/* Features Grid mejorado */}
+        {/* Features Grid limpio */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
           {features.map((feature, index) => (
             <Card 
@@ -81,15 +82,6 @@ export const FeaturesSection = () => {
                   'bg-gradient-to-br from-indigo-50/80 via-white to-indigo-50/60 hover:shadow-indigo-200/50'}
               `}
             >
-              {/* Subtle background pattern */}
-              <div className={`
-                absolute inset-0 opacity-5 bg-[radial-gradient(circle_at_50%_50%,${
-                  feature.color === 'purple' ? '#8b5cf6' :
-                  feature.color === 'red' ? '#ef4444' :
-                  feature.color === 'green' ? '#10b981' : '#6366f1'
-                }_40%,transparent_70%)]
-              `} />
-              
               {/* Top border accent */}
               <div className={`
                 absolute top-0 left-0 right-0 h-1 bg-gradient-to-r
@@ -101,68 +93,37 @@ export const FeaturesSection = () => {
               
               <CardContent className="p-8 relative z-10">
                 <div className="flex items-start gap-6">
-                  {/* Icon container mejorado */}
+                  {/* Icon container */}
                   <div className={`
-                    w-20 h-20 rounded-3xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-all duration-300 shadow-lg relative
-                    ${feature.color === 'purple' ? 'bg-gradient-to-br from-purple-100 to-purple-200 group-hover:from-purple-200 group-hover:to-purple-300' :
-                      feature.color === 'red' ? 'bg-gradient-to-br from-red-100 to-red-200 group-hover:from-red-200 group-hover:to-red-300' :
-                      feature.color === 'green' ? 'bg-gradient-to-br from-green-100 to-green-200 group-hover:from-green-200 group-hover:to-green-300' :
-                      'bg-gradient-to-br from-indigo-100 to-indigo-200 group-hover:from-indigo-200 group-hover:to-indigo-300'}
+                    w-20 h-20 rounded-3xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-all duration-300 shadow-lg
+                    ${feature.color === 'purple' ? 'bg-gradient-to-br from-purple-100 to-purple-200' :
+                      feature.color === 'red' ? 'bg-gradient-to-br from-red-100 to-red-200' :
+                      feature.color === 'green' ? 'bg-gradient-to-br from-green-100 to-green-200' :
+                      'bg-gradient-to-br from-indigo-100 to-indigo-200'}
                   `}>
-                    {/* Glow effect */}
-                    <div className={`
-                      absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-30 transition-opacity duration-300 blur-xl
-                      ${feature.color === 'purple' ? 'bg-purple-400' :
-                        feature.color === 'red' ? 'bg-red-400' :
-                        feature.color === 'green' ? 'bg-green-400' : 'bg-indigo-400'}
-                    `} />
-                    
-                    <div className="text-3xl relative z-10 group-hover:scale-110 transition-transform duration-300">
-                      {feature.emoji}
-                    </div>
+                    <div className="text-3xl">{feature.emoji}</div>
                   </div>
                   
                   {/* Content */}
                   <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-4">
-                      <h3 className="text-2xl font-bold text-gray-900 group-hover:text-gray-800 transition-colors">
-                        {feature.title}
-                      </h3>
-                      <span className={`
-                        inline-flex items-center px-4 py-2 rounded-full text-xs font-semibold shadow-sm
-                        ${feature.color === 'purple' ? 'bg-purple-200/70 text-purple-800 border border-purple-300/50' :
-                          feature.color === 'red' ? 'bg-red-200/70 text-red-800 border border-red-300/50' :
-                          feature.color === 'green' ? 'bg-green-200/70 text-green-800 border border-green-300/50' :
-                          'bg-indigo-200/70 text-indigo-800 border border-indigo-300/50'}
-                      `}>
-                        ✔️ {feature.benefit}
-                      </span>
-                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                      {feature.title}
+                    </h3>
                     
-                    <p className="text-gray-700 leading-relaxed text-lg mb-6 group-hover:text-gray-800 transition-colors">
+                    <p className="text-gray-700 leading-relaxed text-lg mb-6">
                       {feature.description}
                     </p>
                     
-                    {/* Status indicator mejorado */}
+                    {/* Beneficio clave */}
                     <div className={`
-                      flex items-center gap-3 text-sm bg-white/60 backdrop-blur-sm rounded-xl px-4 py-3 border
-                      ${feature.color === 'purple' ? 'border-purple-200/50' :
-                        feature.color === 'red' ? 'border-red-200/50' :
-                        feature.color === 'green' ? 'border-green-200/50' :
-                        'border-indigo-200/50'}
+                      inline-flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold
+                      ${feature.color === 'purple' ? 'bg-purple-100 text-purple-800' :
+                        feature.color === 'red' ? 'bg-red-100 text-red-800' :
+                        feature.color === 'green' ? 'bg-green-100 text-green-800' :
+                        'bg-indigo-100 text-indigo-800'}
                     `}>
-                      <div className={`
-                        w-2 h-2 rounded-full animate-pulse
-                        ${feature.color === 'purple' ? 'bg-purple-500' :
-                          feature.color === 'red' ? 'bg-red-500' :
-                          feature.color === 'green' ? 'bg-green-500' : 'bg-indigo-500'}
-                      `} />
-                      <span className="text-gray-600 font-medium">
-                        {index === 0 ? 'Validando 24/7' :
-                         index === 1 ? 'Monitoreando continuamente' :
-                         index === 2 ? 'Sincronizando en tiempo real' :
-                         'Generando reportes automáticamente'}
-                      </span>
+                      <CheckCircle className="h-4 w-4" />
+                      <span>{feature.benefit}</span>
                     </div>
                   </div>
                 </div>
@@ -171,33 +132,29 @@ export const FeaturesSection = () => {
           ))}
         </div>
 
-        {/* Bottom CTA section */}
-        <div className="text-center bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-12 text-white relative overflow-hidden">
-          {/* Background decoration */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.1)_0%,transparent_50%)] opacity-50" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(255,255,255,0.1)_0%,transparent_50%)] opacity-50" />
-          
+        {/* Bottom CTA simplificado */}
+        <div className="text-center bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-12 text-white relative overflow-hidden">          
           <div className="max-w-3xl mx-auto relative z-10">
             <h3 className="text-3xl md:text-4xl font-bold mb-4">
-              ¿Listo para olvidarte de validar pagos?
+              ¿Listo para dejar de perder dinero validando pagos?
             </h3>
             <p className="text-xl text-purple-100 mb-8">
-              Súmate a los negocios que ya no pierden tiempo ni caen en fraudes.
+              Únete a los 100+ negocios que ya automatizan sus validaciones.
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <button 
-                className="bg-white text-purple-600 hover:bg-gray-50 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
+                className="bg-white text-purple-600 hover:bg-gray-50 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 hover:scale-105 shadow-lg"
                 onClick={() => {
-                  const message = "Estoy interesado en Ya Quedó para mi negocio";
+                  const message = "Quiero mis 7 días GRATIS de Ya Quedó para mi negocio";
                   const whatsappUrl = `https://wa.me/573183849532?text=${encodeURIComponent(message)}`;
                   window.open(whatsappUrl, '_blank');
                 }}
               >
-                🚀 Probar gratis ahora
+                🚀 Probar 7 días gratis
               </button>
-              <button className="border-2 border-white/30 text-white hover:bg-white/10 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 hover:scale-105">
-                👀 Agendar demo
+              <button className="border-2 border-white/30 text-white hover:bg-white/10 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300">
+                👀 Ver demo rápido
               </button>
             </div>
             
@@ -208,7 +165,7 @@ export const FeaturesSection = () => {
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-4 w-4" />
-                <span>Configuración en minutos</span>
+                <span>Configuracion en 5 minutos</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-4 w-4" />

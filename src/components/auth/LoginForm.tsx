@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Zap, Eye, EyeOff, Loader2, ArrowRight, Shield } from "lucide-react";
+import { Zap, Eye, EyeOff, Loader2, ArrowRight, Shield, ArrowLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
@@ -29,10 +29,14 @@ export const LoginForm = () => {
     const { error } = await signIn(email, password);
     
     if (!error) {
-      navigate("/dashboard");
+      // Login exitoso - mantener loading un poco más para mostrar el toast
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 1200);
+    } else {
+      // Solo si hay error explícito
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   };
 
   return (
@@ -163,6 +167,17 @@ export const LoginForm = () => {
                 <Shield className="h-3 w-3" />
                 ¿Olvidaste tu contraseña?
               </Link>
+              
+              {/* Botón prominente para regresar a landing */}
+              <div className="pt-4 border-t border-gray-100">
+                <Link 
+                  to="/" 
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 hover:text-purple-600 hover:border-purple-200 transition-all duration-200"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Volver al inicio
+                </Link>
+              </div>
               
               {/* <div className="text-sm text-gray-600">
                 ¿Aún no tienes cuenta?{" "}
