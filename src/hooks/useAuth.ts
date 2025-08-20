@@ -92,7 +92,20 @@ export const useAuth = () => {
   const signUp = async (email: string, password: string, fullName: string, userIdCard: string, businessName: string, plan: string = 'basico') => {
     try {
       setLoading(true);
-      const redirectUrl = `${window.location.origin}/login`; // Redirigir a login para que confirmen su email
+      // Configurar URL de redirección según el entorno
+      const getRedirectUrl = () => {
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        
+        if (isLocalhost) {
+          // En desarrollo, usar localhost
+          return `${window.location.origin}/login`;
+        } else {
+          // En producción, usar la URL actual del dominio
+          return `${window.location.origin}/login`;
+        }
+      };
+      
+      const redirectUrl = getRedirectUrl();
       
       const { error } = await supabase.auth.signUp({
         email,
