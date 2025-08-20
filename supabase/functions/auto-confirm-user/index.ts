@@ -33,7 +33,33 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log('Auto-confirm user request:', { email, fullName, businessName, plan });
 
-    // 1. Crear usuario con confirmación automática usando admin client
+    // 1. Verificar si el usuario ya existe primero
+    const { data: existingUsers, error: listError } = await supabaseAdmin.auth.admin.listUsers({
+      filter: `email.eq.${email}`
+    });
+
+    if (listError) {
+      console.error('Error checking existing users:', listError);
+    }
+
+    if (existingUsers && existingUsers.users && existingUsers.users.length > 0) {
+      const existingUser = existingUsers.users[0];
+      console.log('User already exists:', existingUser.id, 'confirmed:', existingUser.email_confirmed_at);
+      
+      // Si el usuario existe pero no está confirmado, lo eliminamos y creamos uno nuevo
+      if (!existingUser.email_confirmed_at) {
+        console.log('Deleting unconfirmed user to recreate...');
+        const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(existingUser.id);
+        if (deleteError) {
+          console.error('Error deleting unconfirmed user:', deleteError);
+        }
+      } else {
+        // Si está confirmado, devolver error específico
+        throw new Error('email_exists');
+      }
+    }
+
+    // 2. Crear usuario con confirmación automática usando admin client
     const { data: signUpData, error: signUpError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
