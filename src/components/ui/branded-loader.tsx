@@ -120,7 +120,7 @@ export const BrandedLoader = ({ text = "Cargando...", className = "" }: BrandedL
       </div>
 
       {/* CSS personalizado simplificado */}
-      <style jsx>{`
+      <style>{`
         @keyframes gentle-float {
           0%, 100% {
             transform: translateY(0px);

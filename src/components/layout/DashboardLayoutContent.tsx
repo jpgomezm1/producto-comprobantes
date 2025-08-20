@@ -91,7 +91,9 @@ export const DashboardLayoutContent = ({ children }: DashboardLayoutContentProps
           return;
         }
 
-        if (userProfile.is_active !== undefined && userProfile.is_active === false) {
+        // Check if user is active (if the field exists in the profile)
+        const typedProfile = userProfile as any;
+        if (typedProfile.is_active !== undefined && typedProfile.is_active === false) {
           toast({
             title: "Acceso Denegado",
             description: "Tu cuenta no se encuentra activa. Por favor, contacta a soporte.",

@@ -92,26 +92,11 @@ export const useAuth = () => {
   const signUp = async (email: string, password: string, fullName: string, userIdCard: string, businessName: string, plan: string = 'basico') => {
     try {
       setLoading(true);
-      // Configurar URL de redirección según el entorno
-      const getRedirectUrl = () => {
-        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        
-        if (isLocalhost) {
-          // En desarrollo, usar localhost
-          return `${window.location.origin}/login`;
-        } else {
-          // En producción, usar la URL actual del dominio
-          return `${window.location.origin}/login`;
-        }
-      };
       
-      const redirectUrl = getRedirectUrl();
-      
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: redirectUrl,
           data: {
             full_name: fullName,
             user_id_card: userIdCard,
@@ -125,10 +110,27 @@ export const useAuth = () => {
         throw error;
       }
 
-      toast({
-        title: "¡Registro casi listo!",
-        description: "Revisa tu email para confirmar tu cuenta y poder iniciar sesión.",
-      });
+      // Si el usuario se registró exitosamente y no necesita confirmación por email
+      if (data?.user && data?.session) {
+        toast({
+          title: "¡Registro exitoso!",
+          description: "Tu cuenta ha sido creada correctamente. ¡Bienvenido!",
+        });
+        
+        // Trigger welcome event
+        setTimeout(() => {
+          const userName = data.user.email || 'Usuario';
+          window.dispatchEvent(new CustomEvent('loginSuccess', { 
+            detail: { userName } 
+          }));
+        }, 500);
+      } else if (data?.user && !data?.session) {
+        // Caso donde se requiere confirmación por email (no debería pasar con la configuración actual)
+        toast({
+          title: "¡Registro casi listo!",
+          description: "Revisa tu email para confirmar tu cuenta.",
+        });
+      }
 
       return { error: null };
     } catch (error: any) {
