@@ -107,8 +107,11 @@ const handler = async (req: Request): Promise<Response> => {
         errorMessage = 'Ya existe una cuenta con estos datos';
       }
       statusCode = 400;
-    } else if (error.message.includes('User already registered')) {
-      errorMessage = 'Este email ya está registrado';
+    } else if (error.message.includes('User already registered') || error.message.includes('A user with this email address has already been registered')) {
+      errorMessage = 'Este email ya está registrado. Intenta iniciar sesión en su lugar.';
+      statusCode = 400;
+    } else if (error.code === 'email_exists') {
+      errorMessage = 'Este email ya está registrado. Intenta iniciar sesión en su lugar.';
       statusCode = 400;
     }
 
