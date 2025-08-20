@@ -83,25 +83,37 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log('User created successfully:', signUpData.user.id);
 
-    // 2. Crear perfil en la tabla profiles
-    const { error: profileError } = await supabaseAdmin
+    // 2. Crear o actualizar perfil en la tabla profiles
+    const { data: existingProfile } = await supabaseAdmin
       .from('profiles')
-      .insert({
-        user_id: signUpData.user.id,
-        full_name: fullName,
-        user_id_card: userIdCard,
-        business_name: businessName,
-        selected_plan: plan,
-        is_active: true,
-        onboarding_completed: false
-      });
+      .select('user_id')
+      .eq('user_id', signUpData.user.id)
+      .single();
 
-    if (profileError) {
-      console.error('Error creating profile:', profileError);
-      // No fallar por esto, el usuario ya está creado
-      console.log('Profile creation failed but user exists, continuing...');
+    if (!existingProfile) {
+      // El perfil no existe, crearlo
+      const { error: profileError } = await supabaseAdmin
+        .from('profiles')
+        .insert({
+          user_id: signUpData.user.id,
+          full_name: fullName,
+          user_id_card: userIdCard,
+          business_name: businessName,
+          selected_plan: plan,
+          is_active: true,
+          onboarding_completed: false
+        });
+
+      if (profileError) {
+        console.error('Error creating profile:', profileError);
+        // Intentar eliminar el usuario creado si no se pudo crear el perfil
+        await supabaseAdmin.auth.admin.deleteUser(signUpData.user.id);
+        throw new Error('No se pudo crear el perfil del usuario');
+      } else {
+        console.log('Profile created successfully');
+      }
     } else {
-      console.log('Profile created successfully');
+      console.log('Profile already exists for user, skipping creation');
     }
 
     // 3. Retornar datos para login inmediato
