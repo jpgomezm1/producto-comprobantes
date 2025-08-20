@@ -93,44 +93,56 @@ export const useAuth = () => {
     try {
       setLoading(true);
       
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: fullName,
-            user_id_card: userIdCard,
-            business_name: businessName,
-            plan: plan
-          }
+      // Usar nuestra edge function para registro con confirmación automática
+      const { data, error } = await supabase.functions.invoke('auto-confirm-user', {
+        body: {
+          email,
+          password,
+          fullName,
+          userIdCard,
+          businessName,
+          plan
         }
       });
 
       if (error) {
-        throw error;
+        console.error('Edge function error:', error);
+        throw new Error(error.message || 'Error al crear la cuenta');
       }
 
-      // Si el usuario se registró exitosamente y no necesita confirmación por email
-      if (data?.user && data?.session) {
-        toast({
-          title: "¡Registro exitoso!",
-          description: "Tu cuenta ha sido creada correctamente. ¡Bienvenido!",
-        });
-        
-        // Trigger welcome event
-        setTimeout(() => {
-          const userName = data.user.email || 'Usuario';
-          window.dispatchEvent(new CustomEvent('loginSuccess', { 
-            detail: { userName } 
-          }));
-        }, 500);
-      } else if (data?.user && !data?.session) {
-        // Caso donde se requiere confirmación por email (no debería pasar con la configuración actual)
-        toast({
-          title: "¡Registro casi listo!",
-          description: "Revisa tu email para confirmar tu cuenta.",
-        });
+      if (!data.success) {
+        throw new Error(data.error || 'Error al crear la cuenta');
       }
+
+      // Usuario creado exitosamente, ahora hacer login automático
+      const { error: loginError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (loginError) {
+        console.error('Auto-login error:', loginError);
+        // Si falla el login automático, mostrar mensaje diferente
+        toast({
+          title: "¡Cuenta creada!",
+          description: "Tu cuenta ha sido creada. Ahora puedes iniciar sesión.",
+        });
+        return { error: null };
+      }
+
+      // Login exitoso
+      toast({
+        title: "¡Registro exitoso!",
+        description: "Tu cuenta ha sido creada correctamente. ¡Bienvenido!",
+      });
+      
+      // Trigger welcome event
+      setTimeout(() => {
+        const userName = email || 'Usuario';
+        window.dispatchEvent(new CustomEvent('loginSuccess', { 
+          detail: { userName } 
+        }));
+      }, 500);
 
       return { error: null };
     } catch (error: any) {
