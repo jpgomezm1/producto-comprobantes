@@ -1,20 +1,20 @@
-
 import { useState, useEffect } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+// import { useWelcome } from '@/contexts/WelcomeContext';
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  // const { triggerWelcome } = useWelcome();
 
   useEffect(() => {
     // Configurar listener de cambios de autenticación
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        console.log('Auth state change:', event, session?.user?.email);
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
@@ -23,7 +23,6 @@ export const useAuth = () => {
 
     // Verificar sesión actual
     supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log('Initial session check:', session?.user?.email);
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
@@ -36,15 +35,12 @@ export const useAuth = () => {
     setLoading(true);
     
     try {
-      console.log('Attempting sign in for:', email);
-      
       const { error, data } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
-        console.error('Sign in error:', error);
         setLoading(false);
         const errorMessage = 
           error.message === 'Invalid login credentials' 
@@ -60,12 +56,13 @@ export const useAuth = () => {
         return { error: error.message };
       }
 
+      // Login exitoso - mostrar welcome dialog
       if (data?.user && data?.session) {
-        console.log('Sign in successful for:', data.user.email);
-        
-        // Trigger welcome event
+        // Pequeño delay para asegurar que el estado se actualice primero
         setTimeout(() => {
+          // Obtener nombre del email o usar email completo
           const userName = data.user.email || 'Usuario';
+          // Disparar evento personalizado para el welcome dialog
           window.dispatchEvent(new CustomEvent('loginSuccess', { 
             detail: { userName } 
           }));
@@ -75,12 +72,13 @@ export const useAuth = () => {
         return { error: null };
       }
 
+      // Caso inesperado - no hay error pero tampoco usuario
       setLoading(false);
-      return { error: null };
+      return { error: null }; // Cambiamos esto para no mostrar error si el login técnicamente funcionó
       
     } catch (error: any) {
-      console.error('Sign in exception:', error);
       setLoading(false);
+      // Solo mostrar error si realmente hubo una excepción
       toast({
         title: "Error al iniciar sesión",
         description: 'Error de conexión. Inténtalo de nuevo.',
@@ -94,59 +92,34 @@ export const useAuth = () => {
   const signUp = async (email: string, password: string, fullName: string, userIdCard: string, businessName: string, plan: string = 'basico') => {
     try {
       setLoading(true);
+      const redirectUrl = `${window.location.origin}/login`; // Redirigir a login para que confirmen su email
       
-      console.log('Starting sign up process for:', email);
-      
-      // Usar nuestra edge function para registro con confirmación automática
-      const { data, error } = await supabase.functions.invoke('auto-confirm-user', {
-        body: {
-          email,
-          password,
-          fullName,
-          userIdCard,
-          businessName,
-          plan
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: redirectUrl,
+          data: {
+            full_name: fullName,
+            user_id_card: userIdCard,
+            business_name: businessName,
+            plan: plan
+          }
         }
       });
 
       if (error) {
-        console.error('Edge function error:', error);
-        throw new Error(error.message || 'Error al crear la cuenta');
+        throw error;
       }
 
-      if (!data.success) {
-        console.error('Edge function returned error:', data.error);
-        throw new Error(data.error || 'Error al crear la cuenta');
-      }
-
-      console.log('User created successfully, attempting auto-login');
-
-      // Pequeña pausa para asegurar que el usuario esté completamente creado
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Intentar login automático
-      const loginResult = await signIn(email, password);
-      
-      if (loginResult.error) {
-        console.error('Auto-login failed:', loginResult.error);
-        toast({
-          title: "¡Cuenta creada!",
-          description: "Tu cuenta ha sido creada. Ahora puedes iniciar sesión manualmente.",
-        });
-        return { error: null };
-      }
-
-      console.log('Auto-login successful');
-      
       toast({
-        title: "¡Registro exitoso!",
-        description: "Tu cuenta ha sido creada correctamente. ¡Bienvenido!",
+        title: "¡Registro casi listo!",
+        description: "Revisa tu email para confirmar tu cuenta y poder iniciar sesión.",
       });
 
       return { error: null };
-      
     } catch (error: any) {
-      console.error("SignUp Error:", error);
+      console.error("SignUp Error:", error); // Añadimos un log para ver el error completo en consola.
       
       let errorMessage = 'Error al registrarse. Inténtalo de nuevo.';
       if (error.message.includes('duplicate key value violates unique constraint "profiles_user_id_card_key"')) {
@@ -170,8 +143,6 @@ export const useAuth = () => {
   const signOut = async () => {
     try {
       setLoading(true);
-      console.log('Signing out user');
-      
       const { error } = await supabase.auth.signOut();
       
       if (error) {
@@ -183,7 +154,6 @@ export const useAuth = () => {
         description: "Has cerrado sesión correctamente.",
       });
     } catch (error: any) {
-      console.error('Sign out error:', error);
       toast({
         title: "Error",
         description: "Error al cerrar sesión.",

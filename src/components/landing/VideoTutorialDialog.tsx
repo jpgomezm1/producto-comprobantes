@@ -114,6 +114,7 @@ export const VideoTutorialDialog = ({ isOpen, onClose }: VideoTutorialDialogProp
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
         className="max-w-4xl w-[95vw] h-auto p-0 overflow-hidden bg-white border border-gray-200 shadow-2xl"
+        hideCloseButton
       >
         {/* Background matching your UI */}
         <div className="absolute inset-0 bg-gradient-to-br from-white via-purple-50/30 to-indigo-50/40" />
@@ -292,7 +293,7 @@ export const VideoTutorialDialog = ({ isOpen, onClose }: VideoTutorialDialogProp
         </div>
 
         {/* Custom Styles */}
-        <style>{`
+        <style jsx>{`
           .video-progress::-webkit-slider-thumb {
             appearance: none;
             width: 12px;
