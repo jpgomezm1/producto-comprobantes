@@ -21,6 +21,7 @@ export interface UserProfile {
   business_name: string;
   selected_plan: string;
   onboarding_completed: boolean;
+  is_active: boolean;
   created_at: string;
   updated_at: string;
 }

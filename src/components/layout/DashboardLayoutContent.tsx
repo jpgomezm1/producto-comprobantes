@@ -68,7 +68,62 @@ export const DashboardLayoutContent = ({ children }: DashboardLayoutContentProps
 
         if (error) {
           console.error('Error fetching profile:', error);
-          if (error.code !== 'PGRST116' && !error.message.includes('timeout')) {
+          // Solo hacer logout si es un error real, no si simplemente no se encuentra el perfil
+          if (error.code === 'PGRST116') {
+            toast({
+              title: "Configurando perfil",
+              description: "Creando tu perfil de usuario...",
+            });
+            // Intentar crear el perfil con datos básicos
+            try {
+              const { error: insertError } = await supabase
+                .from('profiles')
+                .insert({
+                  user_id: user.id,
+                  full_name: user.email?.split('@')[0] || 'Usuario',
+                  user_id_card: '',
+                  business_name: 'Mi Empresa',
+                  selected_plan: 'basico',
+                  onboarding_completed: false,
+                  is_active: true
+                });
+
+              if (insertError) {
+                throw insertError;
+              }
+
+              // Reintentار buscar el perfil
+              const { data: newProfile, error: refetchError } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('user_id', user.id)
+                .single();
+
+              if (refetchError || !newProfile) {
+                throw new Error('No se pudo crear el perfil');
+              }
+
+              setProfile(newProfile as UserProfile);
+              setOnboardingStatusChecked(true);
+              
+              toast({
+                title: "¡Perfil creado!",
+                description: "Tu perfil se ha configurado correctamente.",
+              });
+              
+              return;
+            } catch (createError) {
+              console.error('Error creating profile:', createError);
+              toast({
+                title: "Error de configuración",
+                description: "No se pudo configurar tu perfil. Contacta a soporte.",
+                variant: "destructive",
+              });
+              await signOut();
+              navigate("/login");
+              return;
+            }
+          } else if (!error.message.includes('timeout')) {
             toast({
               title: "Error de acceso",
               description: "No se pudo cargar tu perfil. Intenta nuevamente.",
@@ -91,7 +146,7 @@ export const DashboardLayoutContent = ({ children }: DashboardLayoutContentProps
           return;
         }
 
-        if (userProfile.is_active !== undefined && userProfile.is_active === false) {
+        if (userProfile.is_active === false) {
           toast({
             title: "Acceso Denegado",
             description: "Tu cuenta no se encuentra activa. Por favor, contacta a soporte.",
