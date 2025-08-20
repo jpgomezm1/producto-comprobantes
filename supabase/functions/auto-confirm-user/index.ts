@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.53.0";
 
@@ -50,17 +51,31 @@ const handler = async (req: Request): Promise<Response> => {
       throw signUpError;
     }
 
+    if (!signUpData.user) {
+      throw new Error('No user data returned from createUser');
+    }
+
     console.log('User created successfully:', signUpData.user.id);
 
-    // 2. Crear sesión para el usuario recién creado
-    const { data: sessionData, error: sessionError } = await supabaseAdmin.auth.admin.generateLink({
-      type: 'magiclink',
-      email: email,
-    });
+    // 2. Crear perfil en la tabla profiles
+    const { error: profileError } = await supabaseAdmin
+      .from('profiles')
+      .insert({
+        user_id: signUpData.user.id,
+        full_name: fullName,
+        user_id_card: userIdCard,
+        business_name: businessName,
+        selected_plan: plan,
+        is_active: true,
+        onboarding_completed: false
+      });
 
-    if (sessionError) {
-      console.error('Error generating session:', sessionError);
+    if (profileError) {
+      console.error('Error creating profile:', profileError);
       // No fallar por esto, el usuario ya está creado
+      console.log('Profile creation failed but user exists, continuing...');
+    } else {
+      console.log('Profile created successfully');
     }
 
     // 3. Retornar datos para login inmediato
@@ -84,13 +99,16 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Manejo específico de errores
     if (error.message.includes('duplicate key value violates unique constraint')) {
-      errorMessage = 'Este email ya está registrado';
+      if (error.message.includes('profiles_user_id_card_key')) {
+        errorMessage = 'La cédula ya está registrada con otra cuenta';
+      } else if (error.message.includes('users_email_key')) {
+        errorMessage = 'Este email ya está registrado';
+      } else {
+        errorMessage = 'Ya existe una cuenta con estos datos';
+      }
       statusCode = 400;
     } else if (error.message.includes('User already registered')) {
       errorMessage = 'Este email ya está registrado';
-      statusCode = 400;
-    } else if (error.message.includes('profiles_user_id_card_key')) {
-      errorMessage = 'La cédula ya está registrada con otra cuenta';
       statusCode = 400;
     }
 
