@@ -43,11 +43,12 @@ export const DashboardLayoutContent = ({ children }: DashboardLayoutContentProps
   const location = useLocation();
   const { currentUsage, limit, isUnlimited, loading: usageLoading } = useComprobantesUsage(profile?.selected_plan || 'basico');
   const [onboardingStatusChecked, setOnboardingStatusChecked] = useState(false);
+  const [isCheckingProfile, setIsCheckingProfile] = useState(false);
   
   const { run, stepIndex, steps, handleJoyrideCallback, startOnboarding, isCompleted } = useOnboarding();
 
   useEffect(() => {
-    if (loading) {
+    if (loading || isCheckingProfile) {
       return;
     }
 
@@ -57,7 +58,19 @@ export const DashboardLayoutContent = ({ children }: DashboardLayoutContentProps
     }
 
     const checkProfileAndPermissions = async () => {
+      if (isCheckingProfile) return;
+      
+      setIsCheckingProfile(true);
       try {
+        // Verificar que la sesión esté activa antes de continuar
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          console.log('🔍 No hay sesión activa, redirigiendo a login');
+          await signOut();
+          navigate("/login");
+          return;
+        }
+
         await new Promise(resolve => setTimeout(resolve, 800));
         
         const { data: userProfile, error } = await supabase
@@ -173,11 +186,13 @@ export const DashboardLayoutContent = ({ children }: DashboardLayoutContentProps
         });
         await signOut();
         navigate("/login");
+      } finally {
+        setIsCheckingProfile(false);
       }
     };
 
     checkProfileAndPermissions();
-  }, [user, loading, navigate, signOut, toast, startOnboarding]);
+  }, [user, loading, navigate, signOut, toast, startOnboarding, isCheckingProfile]);
   
   useEffect(() => {
     if (isCompleted && profile?.onboarding_completed === false) {
